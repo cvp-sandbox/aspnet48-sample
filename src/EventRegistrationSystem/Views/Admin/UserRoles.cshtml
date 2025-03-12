@@ -1,0 +1,151 @@
+﻿@{
+    ViewBag.Title = "Manage User Roles";
+    bool isAdmin = ViewBag.IsAdmin;
+    bool isOrganizer = ViewBag.IsOrganizer;
+    bool isUser = ViewBag.IsUser;
+    string userId = ViewBag.UserId;
+    string userName = ViewBag.UserName;
+}
+
+<h2>Manage Roles for @userName</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Current Roles</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <tr>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr>
+                        <td>Admin</td>
+                        <td>
+                            @if (isAdmin)
+                            {
+                                <span class="label label-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="label label-default">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            @if (isAdmin)
+                            {
+                                using (Html.BeginForm("RemoveFromRole", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <input type="hidden" name="roleName" value="Admin" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("AddToRole", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <input type="hidden" name="roleName" value="Admin" />
+                                    <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Organizer</td>
+                        <td>
+                            @if (isOrganizer)
+                            {
+                                <span class="label label-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="label label-default">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            @if (isOrganizer)
+                            {
+                                using (Html.BeginForm("RemoveFromRole", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <input type="hidden" name="roleName" value="Organizer" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("AddToRole", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <input type="hidden" name="roleName" value="Organizer" />
+                                    <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>User</td>
+                        <td>
+                            @if (isUser)
+                            {
+                                <span class="label label-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="label label-default">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            @if (isUser)
+                            {
+                                using (Html.BeginForm("RemoveFromRole", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <input type="hidden" name="roleName" value="User" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("AddToRole", "Admin", FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <input type="hidden" name="roleName" value="User" />
+                                    <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div>
+            @Html.ActionLink("Back to Users", "Users", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+</div>

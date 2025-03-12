@@ -1,0 +1,39 @@
+﻿﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<main>
+    <!-- Hero Section -->
+    <div class="jumbotron">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md">
+                    <h1 class="display-4">Find events or create your own</h1>
+                    <p class="lead">
+                        An easy-to-use platform to discover local events and manage registrations.
+                        Perfect for both event organizers and attendees.
+                    </p>
+                    <div class="mt-4">
+                        @Html.ActionLink("Browse Events", "Index", "Event", new { area = "" }, new { @class = "btn btn-primary btn-lg me-2" })
+                        @Html.ActionLink("Create Event", "Create", "Event", new { area = "" }, new { @class = "btn btn-success btn-lg me-2" })
+                    </div>
+                </div>
+                @* <div class="col-md-5 d-none d-md-block">
+                    <img src="/api/placeholder/500/300" alt="Event illustration" class="img-fluid rounded">
+                </div> *@
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    @Html.Action("_Stats", "Home")
+
+    <!-- Featured Events Section -->
+    @Html.Action("_FeaturedEvents", "Home")
+
+    <!-- Upcoming Events - User-specific content (show when logged in) -->
+    @if (Request.IsAuthenticated)
+    {
+        @Html.Action("_UpcomingEvents", "Home")
+    }
+</main>

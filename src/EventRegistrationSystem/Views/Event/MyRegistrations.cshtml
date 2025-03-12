@@ -1,0 +1,46 @@
+﻿@model IEnumerable<EventRegistrationSystem.Models.Registration>
+
+@{
+    ViewBag.Title = "My Registrations";
+}
+
+<h2>My Event Registrations</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <p>You haven't registered for any events yet.</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">@Html.DisplayFor(modelItem => item.Event.Name)</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p><strong>Date:</strong> @Html.DisplayFor(modelItem => item.Event.EventDate)</p>
+                        <p><strong>Location:</strong> @Html.DisplayFor(modelItem => item.Event.Location)</p>
+                        <p><strong>Registered on:</strong> @Html.DisplayFor(modelItem => item.RegistrationDate)</p>
+                        <p>
+                            @Html.ActionLink("Event Details", "Details", new { id = item.EventId }, new { @class = "btn btn-info btn-sm" })
+
+                            @if (item.Event.EventDate > DateTime.Now)
+                            {
+                                using (Html.BeginForm("CancelRegistration", "Event", new { id = item.EventId }, FormMethod.Post, new { style = "display: inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-warning btn-sm">Cancel Registration</button>
+                                }
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

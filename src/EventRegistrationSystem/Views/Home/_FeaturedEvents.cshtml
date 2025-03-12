@@ -1,0 +1,29 @@
+@model IEnumerable<EventRegistrationSystem.Models.Event>
+
+<div class="container mb-5">
+    <h2 class="mb-4">Upcoming Events</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var eventItem in Model)
+        {
+            <div class="col">
+                <div class="card h-100 event-card">
+                    <div class="card-body">
+                        @* We could add event type badges here if we had that data *@
+                        <h5 class="card-title">@eventItem.Name</h5>
+                        <p class="card-text">@eventItem.Description</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">@eventItem.EventDate.ToString("MMMM d, yyyy")</small>
+                            <small class="text-muted">@eventItem.RegistrationCount/@eventItem.MaxAttendees spots</small>
+                        </div>
+                        @Html.ActionLink("View Details", "Details", "Event", new { id = eventItem.EventId }, new { @class = "btn btn-outline-primary mt-2 w-100" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="text-center mt-4">
+        @Html.ActionLink("View All Events", "Index", "Event", new { area = "" }, new { @class = "btn btn-outline-primary" })
+    </div>
+</div>

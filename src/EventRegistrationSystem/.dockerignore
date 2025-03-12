@@ -1,0 +1,61 @@
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.vs
+*.vscode
+*.userprefs
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+[Tt]emp/
+[Tt]mp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResults/
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Visual Studio files
+.vs/
+*.sln.docstates
+*.sln.ide/
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Debug files
+*.pdb
+
+# Local development settings
+*.Development.json
+appsettings.Development.json
