@@ -169,3 +169,82 @@ The Event Registration System will be a web application that enables event organ
 - Support for event categories and tags
 - Integration with payment gateways for paid events
 - Addition of a waitlist feature for full events
+
+## 9. Entity-Relationship Diagram
+
+```mermaid
+erDiagram
+    AspNetUsers {
+        string Id PK
+        string Email
+        int EmailConfirmed
+        string PasswordHash
+        string SecurityStamp
+        string PhoneNumber
+        int PhoneNumberConfirmed
+        int TwoFactorEnabled
+        string LockoutEndDateUtc
+        int LockoutEnabled
+        int AccessFailedCount
+        string UserName
+    }
+    
+    AspNetUserClaims {
+        int Id PK
+        string UserId FK
+        string ClaimType
+        string ClaimValue
+    }
+    
+    AspNetUserLogins {
+        string LoginProvider PK
+        string ProviderKey PK
+        string UserId PK,FK
+    }
+    
+    Roles {
+        int RoleId PK
+        string Name
+    }
+    
+    UserRoles {
+        int UserRoleId PK
+        string UserId FK
+        int RoleId FK
+    }
+    
+    Events {
+        int EventId PK
+        string Name
+        string Description
+        string EventDate
+        string Location
+        int MaxAttendees
+        string CreatedBy FK
+        string CreatedDate
+    }
+    
+    Registrations {
+        int RegistrationId PK
+        int EventId FK
+        string UserId FK
+        string RegistrationDate
+    }
+    
+    AspNetUsers ||--o{ AspNetUserClaims : "has"
+    AspNetUsers ||--o{ AspNetUserLogins : "has"
+    AspNetUsers ||--o{ UserRoles : "has"
+    AspNetUsers ||--o{ Events : "creates"
+    AspNetUsers ||--o{ Registrations : "makes"
+    
+    Roles ||--o{ UserRoles : "assigned to"
+    Events ||--o{ Registrations : "has"
+```
+
+The diagram above illustrates the database schema for the Event Registration System, showing the relationships between the core entities:
+
+- **AspNetUsers**: Represents user accounts in the system
+- **Roles & UserRoles**: Manages role-based access control (Admin, Organizer, User)
+- **Events**: Stores event information created by organizers
+- **Registrations**: Tracks user registrations for events
+- **AspNetUserClaims & AspNetUserLogins**: Part of ASP.NET Identity for authentication and authorization
