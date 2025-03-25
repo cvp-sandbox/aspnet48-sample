@@ -20,19 +20,9 @@ namespace EventManagementSystemv2.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            try
-            {
-                var featuredEvents = await _eventRepository.GetFeaturedEventsAsync();
-                ViewBag.FeaturedEvents = featuredEvents;
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving featured events for home page");
-                return View(new List<Event>());
-            }
+            return View();
         }
 
         public IActionResult About()
@@ -46,53 +36,7 @@ namespace EventManagementSystemv2.Controllers
             return View();
         }
 
-        public async Task<IActionResult> FeaturedEvents()
-        {
-            try
-            {
-                var featuredEvents = await _eventRepository.GetFeaturedEventsAsync();
-                return PartialView("_FeaturedEvents", featuredEvents);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving featured events");
-                return PartialView("_FeaturedEvents", new List<Event>());
-            }
-        }
-
-        public async Task<IActionResult> Stats()
-        {
-            try
-            {
-                var stats = await _eventRepository.GetStatsAsync();
-                return PartialView("_Stats", stats);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving stats");
-                return PartialView("_Stats", new List<dynamic>());
-            }
-        }
-
-        public async Task<IActionResult> UpcomingEvents()
-        {
-            // If user is not authenticated, return empty result
-            if (!User.Identity.IsAuthenticated)
-            {
-                return PartialView("_UpcomingEvents", new List<Registration>());
-            }
-
-            try
-            {
-                var upcomingEvents = await _eventRepository.GetUpcomingUserEventsAsync(User.Identity.Name);
-                return PartialView("_UpcomingEvents", upcomingEvents);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving upcoming events");
-                return PartialView("_UpcomingEvents", new List<Registration>());
-            }
-        }
+        // Removed partial view action methods as they're now handled by ViewComponents
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

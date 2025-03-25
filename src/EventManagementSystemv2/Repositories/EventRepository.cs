@@ -108,8 +108,13 @@ namespace EventManagementSystemv2.Repositories
             var thisWeeksEvents = await _context.Events
                 .CountAsync(e => e.EventDate > now && e.EventDate <= nextWeek);
                 
+            // Count registrations for future events by joining Events and Registrations
             var registeredUsers = await _context.Registrations
-                .CountAsync(r => r.Event != null && r.Event.EventDate > now);
+                .Join(_context.Events,
+                    r => r.EventId,
+                    e => e.EventId,
+                    (r, e) => new { Registration = r, Event = e })
+                .CountAsync(joined => joined.Event.EventDate > now);
                 
             var stats = new List<dynamic>
             {
@@ -126,14 +131,25 @@ namespace EventManagementSystemv2.Repositories
             var now = DateTime.Now;
             var nextWeek = now.AddDays(7);
             
-            return await _context.Registrations
-                .Include(r => r.Event)
-                .Where(r => r.UserName == userName && 
-                       r.Event != null && 
-                       r.Event.EventDate > now && 
-                       r.Event.EventDate <= nextWeek)
-                .OrderBy(r => r.Event.EventDate)
-                .ToListAsync();
+            // Join Registrations with Events to filter by event date
+            var query = from r in _context.Registrations
+                        join e in _context.Events on r.EventId equals e.EventId
+                        where r.UserName == userName && 
+                              e.EventDate > now && 
+                              e.EventDate <= nextWeek
+                        orderby e.EventDate
+                        select r;
+            
+            // Load the events for each registration
+            var registrations = await query.ToListAsync();
+            
+            // Manually load the Event navigation property for each registration
+            foreach (var registration in registrations)
+            {
+                registration.Event = await _context.Events.FindAsync(registration.EventId);
+            }
+            
+            return registrations;
         }
     }
 }

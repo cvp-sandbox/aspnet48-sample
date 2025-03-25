@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -23,14 +23,14 @@
     </div>
 
     <!-- Stats Section -->
-    <partial name="_Stats" />
+    <vc:stats></vc:stats>
 
     <!-- Featured Events Section -->
-    <partial name="_FeaturedEvents" model="ViewBag.FeaturedEvents" />
+    <vc:featured-events></vc:featured-events>
 
     <!-- Upcoming Events - User-specific content (show when logged in) -->
     @if (User.Identity.IsAuthenticated)
     {
-        <partial name="_UpcomingEvents" />
+        <vc:upcoming-events></vc:upcoming-events>
     }
 </main>
