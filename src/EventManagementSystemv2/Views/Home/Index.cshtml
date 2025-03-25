@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<main>
+    <!-- Hero Section -->
+    <div class="jumbotron">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md">
+                    <h1 class="display-4">Find events or create your own</h1>
+                    <p class="lead">
+                        An easy-to-use platform to discover local events and manage registrations.
+                        Perfect for both event organizers and attendees.
+                    </p>
+                    <div class="mt-4">
+                        <a asp-controller="Event" asp-action="Index" class="btn btn-primary btn-lg me-2">Browse Events</a>
+                        <a asp-controller="Event" asp-action="Create" class="btn btn-success btn-lg me-2">Create Event</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <partial name="_Stats" />
+
+    <!-- Featured Events Section -->
+    <partial name="_FeaturedEvents" model="ViewBag.FeaturedEvents" />
+
+    <!-- Upcoming Events - User-specific content (show when logged in) -->
+    @if (User.Identity.IsAuthenticated)
+    {
+        <partial name="_UpcomingEvents" />
+    }
+</main>

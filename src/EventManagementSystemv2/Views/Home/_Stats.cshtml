@@ -1,0 +1,26 @@
+@model IEnumerable<dynamic>
+
+<div class="container mb-5">
+    <div class="stats-container">
+        <div class="row">
+            @foreach (var stat in Model)
+            {
+                <div class="col-md-4 stat-item">
+                    <div class="stat-number">@stat.StatValue</div>
+                    @if (stat.StatLabel == "ActiveEvents")
+                    {
+                        <div>Active Events</div>
+                    }
+                    else if (stat.StatLabel == "RegisteredUsers")
+                    {
+                        <div>Registered Users</div>
+                    }
+                    else if (stat.StatLabel == "ThisWeeksEvents")
+                    {
+                        <div>Events This Week</div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
