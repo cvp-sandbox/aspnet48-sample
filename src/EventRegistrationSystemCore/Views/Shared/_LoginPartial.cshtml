@@ -2,25 +2,25 @@
 
 @if (User.Identity?.IsAuthenticated == true)
 {
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <span class="nav-link text-dark">Hello @User.Identity?.Name!</span>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
-        </li>
-    </ul>
+    <form id="logoutForm" class="form-inline navbar-right" asp-controller="Account" asp-action="Logout" method="post">
+        <ul class="navbar-nav navbar-right">
+            <li class="nav-item">
+                <span class="nav-link">Hello @User.Identity?.Name!</span>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+            </li>
+        </ul>
+    </form>
 }
 else
 {
-    <ul class="navbar-nav">
+    <ul class="navbar-nav navbar-right">
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
+            <a class="nav-link" asp-controller="Account" asp-action="Register" id="registerLink">Register</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+            <a class="nav-link" asp-controller="Account" asp-action="Login" id="loginLink">Log in</a>
         </li>
     </ul>
 }
