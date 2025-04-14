@@ -23,12 +23,12 @@ INSERT INTO AspNetUsers (
     AccessFailedCount, 
     UserName
 ) VALUES 
-    ('7', 'admin@example.com', 1, 'AQAAAAEAACcQAAAAEBzZ7MO6EeyHcXzpIKgc+AfYmKy8RL/DbQrh6rRibFUP5rohK7gL32+Z2aG0PdXbmA==', 'a7e8c7f0-c6d9-4b58-8a0e-b7d13592b87e', NULL, 0, 0, NULL, 1, 0, 'admin@example.com'),
-    ('8', 'organizer1@example.com', 1, 'AQAAAAEAACcQAAAAEBzZ7MO6EeyHcXzpIKgc+AfYmKy8RL/DbQrh6rRibFUP5rohK7gL32+Z2aG0PdXbmA==', 'b8f9d6e1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', NULL, 0, 0, NULL, 1, 0, 'organizer1@example.com'),
-    ('3', 'organizer2@example.com', 1, 'AQAAAAEAACcQAAAAEBzZ7MO6EeyHcXzpIKgc+AfYmKy8RL/DbQrh6rRibFUP5rohK7gL32+Z2aG0PdXbmA==', 'c1d2e3f4-g5h6-i7j8-9k10-l11m12n13o14', NULL, 0, 0, NULL, 1, 0, 'organizer2@example.com'),
-    ('4', 'user1@example.com', 1, 'AQAAAAEAACcQAAAAEBzZ7MO6EeyHcXzpIKgc+AfYmKy8RL/DbQrh6rRibFUP5rohK7gL32+Z2aG0PdXbmA==', 'd4e5f6g7-h8i9-j10k-11l12-m13n14o15p', NULL, 0, 0, NULL, 1, 0, 'user1@example.com'),
-    ('5', 'user2@example.com', 1, 'AQAAAAEAACcQAAAAEBzZ7MO6EeyHcXzpIKgc+AfYmKy8RL/DbQrh6rRibFUP5rohK7gL32+Z2aG0PdXbmA==', 'e5f6g7h8-i9j10-k11l-12m13-n14o15p16', NULL, 0, 0, NULL, 1, 0, 'user2@example.com'),
-    ('6', 'user3@example.com', 1, 'AQAAAAEAACcQAAAAEBzZ7MO6EeyHcXzpIKgc+AfYmKy8RL/DbQrh6rRibFUP5rohK7gL32+Z2aG0PdXbmA==', 'f6g7h8i9-j10k11-l12m-13n14-o15p16q', NULL, 0, 0, NULL, 1, 0, 'user3@example.com');
+    ('7', 'admin@example.com', 1, 'AIa8HqoLO8bqYIvdA+sqAexxWufTrSvIJn1BW0aI+aZSHZ7kdGulu6N/x/b0UEL0Ag==', 'a7e8c7f0-c6d9-4b58-8a0e-b7d13592b87e', NULL, 0, 0, NULL, 1, 0, 'admin@example.com'),
+    ('8', 'organizer1@example.com', 1, 'AIa8HqoLO8bqYIvdA+sqAexxWufTrSvIJn1BW0aI+aZSHZ7kdGulu6N/x/b0UEL0Ag==', 'b8f9d6e1-a2b3-4c5d-6e7f-8a9b0c1d2e3f', NULL, 0, 0, NULL, 1, 0, 'organizer1@example.com'),
+    ('3', 'organizer2@example.com', 1, 'AIa8HqoLO8bqYIvdA+sqAexxWufTrSvIJn1BW0aI+aZSHZ7kdGulu6N/x/b0UEL0Ag==', 'c1d2e3f4-g5h6-i7j8-9k10-l11m12n13o14', NULL, 0, 0, NULL, 1, 0, 'organizer2@example.com'),
+    ('4', 'user1@example.com', 1, 'AIa8HqoLO8bqYIvdA+sqAexxWufTrSvIJn1BW0aI+aZSHZ7kdGulu6N/x/b0UEL0Ag==', 'd4e5f6g7-h8i9-j10k-11l12-m13n14o15p', NULL, 0, 0, NULL, 1, 0, 'user1@example.com'),
+    ('5', 'user2@example.com', 1, 'AIa8HqoLO8bqYIvdA+sqAexxWufTrSvIJn1BW0aI+aZSHZ7kdGulu6N/x/b0UEL0Ag==', 'e5f6g7h8-i9j10-k11l-12m13-n14o15p16', NULL, 0, 0, NULL, 1, 0, 'user2@example.com'),
+    ('6', 'user3@example.com', 1, 'AIa8HqoLO8bqYIvdA+sqAexxWufTrSvIJn1BW0aI+aZSHZ7kdGulu6N/x/b0UEL0Ag==', 'f6g7h8i9-j10k11-l12m-13n14-o15p16q', NULL, 0, 0, NULL, 1, 0, 'user3@example.com');
 
 -- Assign roles to users
 INSERT INTO UserRoles (UserId, RoleId) VALUES ('7', (SELECT RoleId FROM Roles WHERE Name = 'Admin'));

@@ -1,1 +1,7 @@
 admin@demo.com / Str0ngP@ssword
+admin@example.com / Str0ngP@ssword
+organizer1@example.com / Str0ngP@ssword
+organizer2@example.com / Str0ngP@ssword
+user1@example.com / Str0ngP@ssword
+user2@example.com / Str0ngP@ssword
+user3@example.com / Str0ngP@ssword
