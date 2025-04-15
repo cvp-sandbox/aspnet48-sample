@@ -7,6 +7,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using EventRegistrationSystem.Models;
 using EventRegistrationSystem.Identity;
+using EventRegistrationSystem.Repositories;
+using System.Web.Mvc;
 
 namespace EventRegistrationSystem
 {
@@ -79,14 +81,40 @@ namespace EventRegistrationSystem
     // Configure the application sign-in manager which is used in this application.
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
     {
+        private readonly IRoleRepository _roleRepository;
+
+        public ApplicationSignInManager(
+            ApplicationUserManager userManager,
+            IAuthenticationManager authenticationManager,
+            IRoleRepository roleRepository)
+            : base(userManager, authenticationManager)
+        {
+            _roleRepository = roleRepository;
+        }
+
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
             : base(userManager, authenticationManager)
         {
         }
 
-        public override Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
+        public override async Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
         {
-            return user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
+            //return user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
+            // Get the basic identity from the user
+            var identity = await user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
+
+            // Add role claims to the identity
+            if (_roleRepository != null)
+            {
+                var roles = _roleRepository.GetUserRoles(user.Id);
+
+                foreach (var role in roles)
+                {
+                    identity.AddClaim(new Claim(type:ClaimTypes.Role, value:role.RoleName));
+                }
+            }
+
+            return identity;
         }
 
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)

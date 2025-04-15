@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using EventRegistrationSystem.Attributes;
 using EventRegistrationSystem.Authorization;
 using EventRegistrationSystem.Models;
+using EventRegistrationSystem.Models.Api;
 using EventRegistrationSystem.Repositories;
+using EventRegistrationSystem.Utils;
 using Microsoft.AspNet.Identity;
 
 namespace EventRegistrationSystem.Controllers
@@ -14,17 +19,42 @@ namespace EventRegistrationSystem.Controllers
         private readonly IEventRepository _eventRepository;
         private readonly IRegistrationRepository _registrationRepository;
 
-        public EventController(IEventRepository eventRepository, IRegistrationRepository registrationRepository)
+        private readonly IApiClient _apiClient;
+
+
+        public EventController(
+            IEventRepository eventRepository,
+            IRegistrationRepository registrationRepository,
+            IApiClient apiClient)
         {
             _eventRepository = eventRepository;
             _registrationRepository = registrationRepository;
+            _apiClient = apiClient;
+
         }
 
         // GET: Event
-        public ActionResult Index()
+        // GET: Event
+        public async Task<ActionResult> Index()
         {
-            var events = _eventRepository.GetAllEvents();
-            return View(events);
+            //var events = _eventRepository.GetAllEvents();
+            //return View(events);
+
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            // Call the API
+            var response = await _apiClient.GetAsync<GetAllEventsResponse>(
+                "api/events",
+                username,
+                roles.ToArray());
+
+            return View(response.Events);
         }
 
         // GET: Event/Details/5

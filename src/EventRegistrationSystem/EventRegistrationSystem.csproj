@@ -199,15 +199,18 @@
     </Compile>
     <Compile Include="Identity\SqliteUserStore.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Api\ApiModels.cs" />
     <Compile Include="Models\EventModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\StatsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\RoleRepository.cs" />
     <Compile Include="Repositories\RegistrationRepository.cs" />
     <Compile Include="Repositories\RepositoryInterfaces.cs" />
     <Compile Include="Repositories\EventRepository.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Utils\ApiClient.cs" />
     <Compile Include="Utils\DotEnvReader.cs" />
   </ItemGroup>
   <ItemGroup>

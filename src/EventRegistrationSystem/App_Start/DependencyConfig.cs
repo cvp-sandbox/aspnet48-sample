@@ -1,6 +1,7 @@
-﻿﻿using System;
+﻿using System;
 using System.Data;
 using System.Data.Entity.Infrastructure;
+using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 using EventRegistrationSystem.Controllers;
@@ -8,6 +9,7 @@ using EventRegistrationSystem.Data;
 using EventRegistrationSystem.Identity;
 using EventRegistrationSystem.Models;
 using EventRegistrationSystem.Repositories;
+using EventRegistrationSystem.Utils;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Unity;
@@ -22,6 +24,16 @@ namespace EventRegistrationSystem
         public static void RegisterDependencies()
         {
             var container = new UnityContainer();
+
+            // Register the ApiClient with its dependencies
+            var apiBaseUrl = System.Configuration.ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "https://localhost:7264";
+            var httpClient = new HttpClient();
+            container.RegisterInstance<HttpClient>(httpClient);
+            container.RegisterInstance<string>("ApiBaseUrl", apiBaseUrl);
+            container.RegisterType<IApiClient, ApiClient>(new InjectionConstructor(
+                new ResolvedParameter<HttpClient>(),
+                new ResolvedParameter<string>("ApiBaseUrl")
+            ));
 
             // Register the SqliteUserStore with its dependencies
             container.RegisterType<SqliteUserStore>(new ContainerControlledLifetimeManager());
@@ -41,13 +53,18 @@ namespace EventRegistrationSystem
             container.RegisterType<ApplicationUserManager>();
             container.RegisterType<ApplicationSignInManager>(new InjectionConstructor(
                 new ResolvedParameter<ApplicationUserManager>(),
-                new ResolvedParameter<IAuthenticationManager>()
+                new ResolvedParameter<IAuthenticationManager>(),
+                new ResolvedParameter<IRoleRepository>()
             ));
+            //container.RegisterType<ApplicationSignInManager>(new InjectionConstructor(
+            //    new ResolvedParameter<ApplicationUserManager>(),
+            //    new ResolvedParameter<IAuthenticationManager>()
+            //));
 
             // Register IAuthenticationManager with a factory method to get it from OWIN context
-            container.RegisterFactory<IAuthenticationManager>(c => HttpContext.Current.GetOwinContext().Authentication, 
+            container.RegisterFactory<IAuthenticationManager>(c => HttpContext.Current.GetOwinContext().Authentication,
                 new HierarchicalLifetimeManager());
-            
+
             // Register MVC controllers
             container.RegisterType<AccountController>();
             container.RegisterType<ManageController>();
