@@ -8,6 +8,7 @@
 *.sln.docstates
 .vs/
 .vscode/
+_tmp/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

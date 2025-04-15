@@ -10,11 +10,121 @@ The Event Registration System will be a web application that enables event organ
 
 ### 1.3 Technical Stack
 - **Framework**: .NET Framework 4.8
-- **Architecture**: ASP.NET MVC
-- **Data Access**: Dapper (micro-ORM)
+- **Architecture**: ASP.NET MVC 5
+- **Data Access**: Dapper 2.1.66 (micro-ORM)
 - **Database**: SQLite (single database for both application data and user authentication)
-- **Authentication**: Custom ASP.NET Identity implementation with SQLite
-- **Dependency Injection**: Unity
+- **Authentication**: ASP.NET Identity 2.2.4 with custom SQLite implementation
+- **Dependency Injection**: Unity 5.11.1
+- **Frontend**: Bootstrap 5.3.3, jQuery 3.7.1
+- **Export Formats**: iCal/ICS for calendar events, CSV for data export
+
+## 1.4 System Architecture
+
+The Event Registration System is built using the following architecture:
+
+```mermaid
+graph TD
+    A[Web Browser] -->|HTTP| B[ASP.NET MVC 5]
+    B --> C[Controllers]
+    C --> D[Business Logic]
+    D --> E[Repository Layer]
+    E -->|Dapper| F[(SQLite Database)]
+    
+    G[ASP.NET Identity] --> B
+    G --> H[Custom SQLiteUserStore]
+    H -->|Dapper| F
+    
+    I[Unity DI Container] -.-> C
+    I -.-> D
+    I -.-> E
+    I -.-> H
+```
+
+This architecture diagram illustrates:
+- The client-server communication via HTTP
+- The MVC pattern with controllers handling requests
+- The repository pattern for data access using Dapper
+- The custom ASP.NET Identity implementation with SQLite
+- The Unity dependency injection container managing component dependencies
+
+## 1.5 Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Controller
+    participant UserManager
+    participant SqliteUserStore
+    participant Database
+    
+    User->>Browser: Enter credentials
+    Browser->>Controller: POST /Account/Login
+    Controller->>UserManager: SignInManager.PasswordSignInAsync()
+    UserManager->>SqliteUserStore: FindByNameAsync()
+    SqliteUserStore->>Database: SELECT query
+    Database-->>SqliteUserStore: User data
+    SqliteUserStore-->>UserManager: ApplicationUser
+    UserManager->>SqliteUserStore: VerifyPasswordHashAsync()
+    SqliteUserStore-->>UserManager: Password verification result
+    UserManager-->>Controller: SignIn result
+    Controller-->>Browser: Redirect + Authentication cookie
+    Browser-->>User: Redirect to home page
+```
+
+This diagram shows the authentication flow when a user logs in:
+1. User submits login credentials
+2. The AccountController processes the login request
+3. UserManager and SqliteUserStore verify the credentials
+4. Upon successful authentication, an authentication cookie is issued
+5. The user is redirected to the home page
+
+## 1.6 Controller Structure
+
+```mermaid
+graph TD
+    A[ASP.NET MVC Pipeline] --> B[HomeController]
+    A --> C[AccountController]
+    A --> D[ManageController]
+    A --> E[EventController]
+    A --> F[AdminController]
+    
+    B --> B1[Index]
+    B --> B2[About]
+    B --> B3[Contact]
+    
+    C --> C1[Login]
+    C --> C2[Register]
+    C --> C3[ForgotPassword]
+    
+    D --> D1[Index]
+    D --> D2[ChangePassword]
+    
+    E --> E1[Index]
+    E --> E2[Details]
+    E --> E3[Create]
+    E --> E4[Edit]
+    E --> E5[Delete]
+    E --> E6[MyEvents]
+    E --> E7[MyRegistrations]
+    
+    F --> F1[Users]
+    F --> F2[UserRoles]
+    
+    classDef public fill:#90EE90
+    classDef authorized fill:#FFD700
+    classDef admin fill:#FF6347
+    
+    class B1,B2,B3,C1,C2,C3 public
+    class D1,D2,E1,E2,E6,E7 authorized
+    class E3,E4,E5 authorized
+    class F1,F2 admin
+```
+
+This diagram illustrates the controller structure of the application:
+- **Green**: Public actions accessible to all users
+- **Yellow**: Actions requiring authentication
+- **Red**: Actions requiring admin privileges
 
 ## 2. Functional Requirements
 
