@@ -16,27 +16,33 @@
             background-color: #e9ecef;
             border-radius: 0.3rem;
         }
+
         .event-card {
             transition: transform 0.3s;
         }
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+
+            .event-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
         .stats-container {
             background-color: #f8f9fa;
             border-radius: 0.3rem;
             padding: 1.5rem;
         }
+
         .stat-item {
             text-align: center;
             padding: 1rem;
         }
+
         .stat-number {
             font-size: 2.5rem;
             font-weight: bold;
             color: #0d6efd;
         }
+
         .search-container {
             background-color: #f1f8ff;
             padding: 1.5rem;
@@ -46,7 +52,7 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-inverse navbar-fixed-top bg-primary">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark navbar-fixed-top bg-primary">
         <div class="container">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">.NET Events</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -64,23 +70,30 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Event" asp-action="Index">All Events</a>
-                    </li>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Event" asp-action="MyEvents">My Events</a>
+                            @* <a class="nav-link" asp-area="" asp-controller="Event" asp-action="Index">All Events</a> *@
+
+                            <legacy-link href="/Event" class="nav-link">All Events</legacy-link>
+
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Event" asp-action="MyRegistrations">My Registrations</a>
+                            @* <a class="nav-link" asp-area="" asp-controller="Event" asp-action="MyEvents">My Events</a> *@
+                            
+                            <legacy-link href="/Event/MyEvents" class="nav-link">My Events</legacy-link>
                         </li>
-                        @if (User.IsInRole("Admin"))
+                        <li class="nav-item">
+                            @* <a class="nav-link" asp-area="" asp-controller="Event" asp-action="MyRegistrations">My Registrations</a> *@
+                            <legacy-link class="nav-link" href="/Event/MyRegistrations">My Registrations</legacy-link>
+                        </li>
+@*                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Users">Admin</a>
+                                 <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Users">Admin</a> 
+                                <legacy-link class="nav-link" href="/Admin/Users">Admin</legacy-link>
                             </li>
-                        }
+                        } *@
                     }
                 </ul>
                 <partial name="_LoginPartial" />

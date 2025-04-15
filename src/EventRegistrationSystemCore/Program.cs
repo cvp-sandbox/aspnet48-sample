@@ -1,5 +1,6 @@
 using EventRegistrationSystemCore.Identity;
 using EventRegistrationSystemCore.Models;
+using EventRegistrationSystemCore.Repositories;
 using EventRegistrationSystemCore.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -36,68 +37,8 @@ builder.Configuration
 
 // Configure YARP
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
-    .AddTransforms(transforms =>
-    {
-        //transforms.AddRequestTransform(context =>
-        //{
-        //    // Forward headers from response to the proxied request
-        //    foreach (var headerName in new[] { "X-UserId", "X-UserName", "X-UserEmail", "X-UserRoles" })
-        //    {
-        //        if (context.HttpContext.Response.Headers.TryGetValue(headerName, out var headerValue))
-        //        {
-        //            context.ProxyRequest.Headers.Remove(headerName);
-        //            context.ProxyRequest.Headers.Add(headerName, headerValue.ToArray());
-        //            Console.WriteLine($"Forwarding response header {headerName}: {string.Join(", ", headerValue)}");
-        //        }
-        //        // Also check request headers
-        //        else if (context.HttpContext.Request.Headers.TryGetValue(headerName, out headerValue))
-        //        {
-        //            context.ProxyRequest.Headers.Remove(headerName);
-        //            context.ProxyRequest.Headers.Add(headerName, headerValue.ToArray());
-        //            Console.WriteLine($"Forwarding request header {headerName}: {string.Join(", ", headerValue)}");
-        //        }
-        //        // Finally, check if User is authenticated
-        //        else if (context.HttpContext.User.Identity?.IsAuthenticated == true)
-        //        {
-        //            string value = null;
-        //            switch (headerName)
-        //            {
-        //                case "X-UserId":
-        //                    value = context.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //                    break;
-        //                case "X-UserName":
-        //                    value = context.HttpContext.User.FindFirstValue(ClaimTypes.Name);
-        //                    break;
-        //                case "X-UserEmail":
-        //                    value = context.HttpContext.User.FindFirstValue(ClaimTypes.Email);
-        //                    break;
-        //                case "X-UserRoles":
-        //                    value = string.Join(",", context.HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value));
-        //                    break;
-        //            }
-        //            if (!string.IsNullOrEmpty(value))
-        //            {
-        //                context.ProxyRequest.Headers.Remove(headerName);
-        //                context.ProxyRequest.Headers.Add(headerName, value);
-        //                Console.WriteLine($"Setting header from claims {headerName}: {value}");
-        //            }
-        //        }
-        //    }
-        //    return ValueTask.CompletedTask;
-        //});
-        //// Forward cookies including authentication cookies
-        //transforms.AddRequestTransform(context =>
-        //{
-        //    if (context.HttpContext.Request.Cookies.Count > 0)
-        //    {
-        //        string cookieValue = string.Join("; ", context.HttpContext.Request.Cookies.Select(c => $"{c.Key}={c.Value}"));
-        //        context.ProxyRequest.Headers.Remove("Cookie");
-        //        context.ProxyRequest.Headers.Add("Cookie", cookieValue);
-        //    }
-        //    return ValueTask.CompletedTask;
-        //});
-    });
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
 
 // Configure SQLite connection
 // Initialize SQLite once at startup
@@ -117,6 +58,10 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     return new SqliteConnection(cs);
 
 });
+
+// Register repository services
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 
 // Configure Identity
 // Add required Identity services
@@ -270,57 +215,36 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-// Add a specific endpoint for Account/Login that maps directly to the controller
+// Map Account Login and Logout for new app
 app.MapControllerRoute(
-    name: "login",
-    pattern: "Account/Login/{*pathInfo}",
+    name: "account-login",
+    pattern: "/Account/Login/{*pathInfo}",
     defaults: new { controller = "Account", action = "Login" });
 
-// Map other controllers
+app.MapControllerRoute(
+    name: "account-logout",
+    pattern: "/Account/Logout/{*pathInfo}",
+    defaults: new { controller = "Account", action = "Logout" });
+
+
+// Map the Home controller to the root URL without including /Home in the URL
+app.MapControllerRoute(
+    name: "home",
+    pattern: "/{action=Index}/{id?}",
+    defaults: new { controller = "Home" });
+
+app.MapControllerRoute(
+    name: "home2",
+    pattern: "home/{action=Index}/{id?}",
+    defaults: new { controller = "Home" });
+
+//// Map other controllers
 //app.MapControllerRoute(
 //    name: "default",
-//    pattern: "{controller=Home}/{action=Index}/{id?}")
-//    .WithStaticAssets();
+//    pattern: "/",
+//    defaults: new { controller = "Home", action = "Index" });
 
-//// Then add your custom middleware for header handling if needed
-//app.Use(async (context, next) =>
-//{
-//    Console.WriteLine($"Request path: {context.Request.Path}");
-//    // Check if auth cookie exists
-//    if (context.Request.Cookies.TryGetValue(GetAuthCookieName(), out var cookieValue))
-//    {
-//        Console.WriteLine("Auth cookie found in request");
-//        Console.WriteLine($"Cookie length: {cookieValue.Length}");
-//        Console.WriteLine($"Cookie starts with: {cookieValue.Substring(0, Math.Min(10, cookieValue.Length))}");
 
-//        // Try to manually validate the cookie
-//        var result = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-//        Console.WriteLine($"Manual authentication result: {result.Succeeded}");
-//        if (!result.Succeeded)
-//        {
-//            Console.WriteLine($"Authentication failure reason: {result.Failure?.Message}");
-//        }
-//    }
-//    else
-//    {
-//        Console.WriteLine("No auth cookie found");
-//        Console.WriteLine($"Available cookies: {string.Join(", ", context.Request.Cookies.Keys)}");
-//    }
-
-//    // Check if user is authenticated
-//    if (context.User.Identity?.IsAuthenticated == true)
-//    {
-//        Console.WriteLine($"User authenticated as: {context.User.Identity.Name}");
-//        Console.WriteLine($"Authentication type: {context.User.Identity.AuthenticationType}");
-//        Console.WriteLine($"Claims: {string.Join(", ", context.User.Claims.Select(c => $"{c.Type}={c.Value}"))}");
-//    }
-//    else
-//    {
-//        Console.WriteLine("User not authenticated");
-//    }
-
-//    await next();
-//});
 
 // Map YARP as the LAST endpoint
 app.MapReverseProxy(proxyPipeline =>
@@ -328,7 +252,7 @@ app.MapReverseProxy(proxyPipeline =>
     proxyPipeline.Use(async (context, next) =>
     {
         // Skip Account/Login routes
-        if (context.Request.Path.StartsWithSegments("/Account/Login"))
+        if (context.Request.Path.StartsWithSegments("/Account/Login") || context.Request.Path.StartsWithSegments("/Home"))
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             return;

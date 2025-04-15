@@ -17,7 +17,8 @@ else
 {
     <ul class="navbar-nav navbar-right">
         <li class="nav-item">
-            <a class="nav-link" asp-controller="Account" asp-action="Register" id="registerLink">Register</a>
+            @* <a class="nav-link" asp-controller="Account" asp-action="Register" id="registerLink">Register</a> *@
+            <legacy-link class="nav-link" href="/Account/Register">Register</legacy-link>
         </li>
         <li class="nav-item">
             <a class="nav-link" asp-controller="Account" asp-action="Login" id="loginLink">Log in</a>

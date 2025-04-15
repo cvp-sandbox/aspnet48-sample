@@ -1,0 +1,46 @@
+@model IEnumerable<EventRegistrationSystemCore.Models.Registration>
+
+<div class="container mb-5">
+    <div class="card">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Your Upcoming Events</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var registration in Model)
+                            {
+                                <tr>
+                                    <td>@registration.Event.Name</td>
+                                    <td>@registration.Event.EventDate.ToString("MMMM d, yyyy")</td>
+                                    <td>@registration.Event.Location</td>
+                                    <td>
+                                        <a asp-controller="Event" asp-action="Details" asp-route-id="@registration.EventId" class="btn btn-sm btn-outline-primary">View</a>
+                                        <a asp-controller="Event" asp-action="CancelRegistration" asp-route-id="@registration.RegistrationId" class="btn btn-sm btn-outline-danger">Cancel</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">You have no upcoming events in the next 7 days.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
