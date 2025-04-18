@@ -23,6 +23,7 @@ namespace EventRegistrationSystem.Controllers
 
 
         public EventController(
+            
             IEventRepository eventRepository,
             IRegistrationRepository registrationRepository,
             IApiClient apiClient)
@@ -33,7 +34,6 @@ namespace EventRegistrationSystem.Controllers
 
         }
 
-        // GET: Event
         // GET: Event
         public async Task<ActionResult> Index()
         {

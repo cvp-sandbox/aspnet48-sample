@@ -14,7 +14,7 @@ public static class GetAllEventsEndpoint
             // Access the authenticated user
             var user = context.User;
             var username = user.Identity?.Name;
-            var isAdmin = user.IsInRole(Roles.Admin.Name); //TODO: why is this not getting the role claims
+            var isAdmin = user.IsInRole(Roles.Admin.Name); 
 
             var request = new GetAllEventsRequest();
             var response = await handler.HandleAsync(request);
