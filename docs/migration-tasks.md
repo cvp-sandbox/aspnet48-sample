@@ -4,7 +4,9 @@ We have .NET Framework 4.8 ASP.NET MVC application `EventRegistrationSystem` and
 
 
 ## EventController
-1. Identify all actions in `EventController` and their corresponding business logic.
+NOTE: We have successfully created the `EventManagement.Api` project with a working endpoint for `src\EventManagement.Api\Features\Events\GetAllEvents\GetAllEventsHandler.cs`; with unit test and integration tests for the `GetAllEventsHandler.cs` handler;  in the legacy application, this endpoint is called using the class `ApiClient` in the `EventController` `Index` action
+
+1. Identify all remaining actions in `EventController` and their corresponding business logic.
 2. Create new request handlers in `EventManagement.Api` for each action in `EventController`.
 3. Implement unit tests for each new request handler using Xunit and NSubstitute.
 4. Implement integration tests for each new request handler.
