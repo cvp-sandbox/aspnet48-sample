@@ -61,10 +61,10 @@
                         <li>@Html.ActionLink("My Events", "MyEvents", "Event", new { area = "" }, new { @class = "nav-link" })</li>
                         <li>@Html.ActionLink("My Registrations", "MyRegistrations", "Event", new { area = "" }, new { @class = "nav-link" })</li>
 
-                        if (User.IsInRole("Admin"))
+                        @*if (User.IsInRole("Admin"))
                         {
                             <li>@Html.ActionLink("Admin", "Users", "Admin", new { area = "" }, new { @class = "nav-link" })</li>
-                        }
+                        }*@
                     }
                 </ul>
                  @Html.Partial("_LoginPartial")

@@ -58,26 +58,59 @@ namespace EventRegistrationSystem.Controllers
         }
 
         // GET: Event/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            var eventEntity = _eventRepository.GetEventById(id);
-            if (eventEntity == null)
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            try
             {
-                return HttpNotFound();
+                // Call the API
+                var response = await _apiClient.GetAsync<dynamic>(
+                    $"api/events/{id}",
+                    username,
+                    roles.ToArray());
+
+                if (response.Event == null)
+                {
+                    return HttpNotFound();
+                }
+
+                // Convert the dynamic response to an Event object
+                var eventEntity = new Event
+                {
+                    EventId = response.Event.EventId,
+                    Name = response.Event.Name,
+                    Description = response.Event.Description,
+                    EventDate = response.Event.EventDate,
+                    Location = response.Event.Location,
+                    MaxAttendees = response.Event.MaxAttendees,
+                    CreatedBy = response.Event.CreatedBy,
+                    CreatedDate = response.Event.CreatedDate,
+                    RegistrationCount = response.RegistrationCount
+                };
+
+                ViewBag.IsRegistered = response.IsRegistered;
+                ViewBag.IsCreator = response.IsCreator;
+
+                return View(eventEntity);
             }
-
-            string userId = User.Identity.GetUserId();
-            ViewBag.IsRegistered = _registrationRepository.GetRegistration(id, userId) != null;
-            ViewBag.IsCreator = eventEntity.CreatedBy == userId;
-
-            return View(eventEntity);
+            catch (Exception ex)
+            {
+                // Log the exception
+                return View("Error");
+            }
         }
 
         // GET: Event/Create
         [AuthorizeRoles(Roles.Admin, Roles.Organizer)]
         public ActionResult Create()
         {
-
             return View();
         }
 
@@ -85,15 +118,44 @@ namespace EventRegistrationSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AuthorizeRoles(Roles.Admin, Roles.Organizer)]
-        public ActionResult Create(Event eventEntity)
+        public async Task<ActionResult> Create(Event eventEntity)
         {
             if (ModelState.IsValid)
             {
-                eventEntity.CreatedBy = User.Identity.GetUserId();
-                eventEntity.CreatedDate = DateTime.Now;
+                string username = User.Identity.GetUserName();
 
-                int eventId = _eventRepository.CreateEvent(eventEntity);
-                return RedirectToAction("Details", new { id = eventId });
+                // Get user roles
+                var roles = new List<string>();
+                if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+                if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+                if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+                try
+                {
+                    // Prepare request data
+                    var requestData = new
+                    {
+                        Name = eventEntity.Name,
+                        Description = eventEntity.Description,
+                        EventDate = eventEntity.EventDate,
+                        Location = eventEntity.Location,
+                        MaxAttendees = eventEntity.MaxAttendees
+                    };
+
+                    // Call the API
+                    var response = await _apiClient.PostAsync<object, dynamic>(
+                        "api/events",
+                        requestData,
+                        username,
+                        roles.ToArray());
+
+                    return RedirectToAction("Details", new { id = response.EventId });
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    ModelState.AddModelError("", "An error occurred while creating the event.");
+                }
             }
 
             return View(eventEntity);
@@ -101,43 +163,105 @@ namespace EventRegistrationSystem.Controllers
 
         // GET: Event/Edit/5
         [AuthorizeRoles(Roles.Admin, Roles.Organizer)]
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            var eventEntity = _eventRepository.GetEventById(id);
-            if (eventEntity == null)
-            {
-                return HttpNotFound();
-            }
+            string username = User.Identity.GetUserName();
 
-            // Only event creator or admin can edit
-            string userId = User.Identity.GetUserId();
-            if (eventEntity.CreatedBy != userId && !User.IsInRole(Roles.Admin))
-            {
-                return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
-            }
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
 
-            return View(eventEntity);
+            try
+            {
+                // Call the API
+                var response = await _apiClient.GetAsync<dynamic>(
+                    $"api/events/{id}",
+                    username,
+                    roles.ToArray());
+
+                if (response.Event == null)
+                {
+                    return HttpNotFound();
+                }
+
+                // Check if user is authorized to edit
+                if (!response.IsCreator && !User.IsInRole(Roles.Admin))
+                {
+                    return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
+                }
+
+                // Convert the dynamic response to an Event object
+                var eventEntity = new Event
+                {
+                    EventId = response.Event.EventId,
+                    Name = response.Event.Name,
+                    Description = response.Event.Description,
+                    EventDate = response.Event.EventDate,
+                    Location = response.Event.Location,
+                    MaxAttendees = response.Event.MaxAttendees,
+                    CreatedBy = response.Event.CreatedBy,
+                    CreatedDate = response.Event.CreatedDate
+                };
+
+                return View(eventEntity);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return View("Error");
+            }
         }
 
         // POST: Event/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AuthorizeRoles(Roles.Admin, Roles.Organizer)]
-        public ActionResult Edit(Event eventEntity)
+        public async Task<ActionResult> Edit(Event eventEntity)
         {
             if (ModelState.IsValid)
             {
-                var originalEvent = _eventRepository.GetEventById(eventEntity.EventId);
+                string username = User.Identity.GetUserName();
 
-                // Only event creator or admin can edit
-                string userId = User.Identity.GetUserId();
-                if (originalEvent.CreatedBy != userId && !User.IsInRole(Roles.Admin))
+                // Get user roles
+                var roles = new List<string>();
+                if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+                if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+                if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+                try
+                {
+                    // Prepare request data
+                    var requestData = new
+                    {
+                        EventId = eventEntity.EventId,
+                        Name = eventEntity.Name,
+                        Description = eventEntity.Description,
+                        EventDate = eventEntity.EventDate,
+                        Location = eventEntity.Location,
+                        MaxAttendees = eventEntity.MaxAttendees
+                    };
+
+                    // Call the API
+                    await _apiClient.PostAsync<object, dynamic>(
+                        $"api/events/{eventEntity.EventId}",
+                        requestData,
+                        username,
+                        roles.ToArray(),
+                        HttpMethod.Put);
+
+                    return RedirectToAction("Details", new { id = eventEntity.EventId });
+                }
+                catch (HttpRequestException ex) when (ex.Message.Contains("403"))
                 {
                     return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
                 }
-
-                _eventRepository.UpdateEvent(eventEntity);
-                return RedirectToAction("Details", new { id = eventEntity.EventId });
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    ModelState.AddModelError("", "An error occurred while updating the event.");
+                }
             }
 
             return View(eventEntity);
@@ -145,118 +269,285 @@ namespace EventRegistrationSystem.Controllers
 
         // GET: Event/Delete/5
         [AuthorizeRoles(Roles.Admin, Roles.Organizer)]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var eventEntity = _eventRepository.GetEventById(id);
-            if (eventEntity == null)
-            {
-                return HttpNotFound();
-            }
+            string username = User.Identity.GetUserName();
 
-            // Only event creator or admin can delete
-            string userId = User.Identity.GetUserId();
-            if (eventEntity.CreatedBy != userId && !User.IsInRole(Roles.Admin))
-            {
-                return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
-            }
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
 
-            return View(eventEntity);
+            try
+            {
+                // Call the API
+                var response = await _apiClient.GetAsync<dynamic>(
+                    $"api/events/{id}",
+                    username,
+                    roles.ToArray());
+
+                if (response.Event == null)
+                {
+                    return HttpNotFound();
+                }
+
+                // Check if user is authorized to delete
+                if (!response.IsCreator && !User.IsInRole(Roles.Admin))
+                {
+                    return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
+                }
+
+                // Convert the dynamic response to an Event object
+                var eventEntity = new Event
+                {
+                    EventId = response.Event.EventId,
+                    Name = response.Event.Name,
+                    Description = response.Event.Description,
+                    EventDate = response.Event.EventDate,
+                    Location = response.Event.Location,
+                    MaxAttendees = response.Event.MaxAttendees,
+                    CreatedBy = response.Event.CreatedBy,
+                    CreatedDate = response.Event.CreatedDate
+                };
+
+                return View(eventEntity);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return View("Error");
+            }
         }
 
         // POST: Event/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [AuthorizeRoles(Roles.Admin, Roles.Organizer)]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            var eventEntity = _eventRepository.GetEventById(id);
+            string username = User.Identity.GetUserName();
 
-            // Only event creator or admin can delete
-            string userId = User.Identity.GetUserId();
-            if (eventEntity.CreatedBy != userId && !User.IsInRole(Roles.Admin))
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            try
+            {
+                // Call the API
+                await _apiClient.DeleteAsync(
+                    $"api/events/{id}",
+                    username,
+                    roles.ToArray());
+
+                return RedirectToAction("Index");
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("403"))
             {
                 return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
             }
-
-            _eventRepository.DeleteEvent(id);
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                // Log the exception
+                return View("Error");
+            }
         }
 
         // POST: Event/Register/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Register(int id)
+        public async Task<ActionResult> Register(int id)
         {
-            var eventEntity = _eventRepository.GetEventById(id);
-            if (eventEntity == null)
-            {
-                return HttpNotFound();
-            }
+            string username = User.Identity.GetUserName();
 
-            // Check if event is full
-            int registrationCount = _eventRepository.GetRegistrationCount(id);
-            if (eventEntity.MaxAttendees > 0 && registrationCount >= eventEntity.MaxAttendees)
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            try
             {
-                TempData["ErrorMessage"] = "This event is already at full capacity.";
+                // Call the API
+                var response = await _apiClient.PostAsync<object, dynamic>(
+                    $"api/events/{id}/register",
+                    null,
+                    username,
+                    roles.ToArray());
+
+                if (response.Success)
+                {
+                    TempData["SuccessMessage"] = response.Message;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = response.Message;
+                }
+
                 return RedirectToAction("Details", new { id });
             }
-
-            string userId = User.Identity.GetUserId();
-
-            // Check if already registered
-            if (_registrationRepository.GetRegistration(id, userId) != null)
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "You are already registered for this event.";
+                // Log the exception
+                TempData["ErrorMessage"] = "An error occurred while registering for the event.";
                 return RedirectToAction("Details", new { id });
             }
-
-            var registration = new Registration
-            {
-                EventId = id,
-                UserId = userId,
-                RegistrationDate = DateTime.Now
-            };
-
-            _registrationRepository.CreateRegistration(registration);
-            TempData["SuccessMessage"] = "You have successfully registered for this event.";
-
-            return RedirectToAction("Details", new { id });
         }
 
         // POST: Event/CancelRegistration/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CancelRegistration(int id)
+        public async Task<ActionResult> CancelRegistration(int id)
         {
-            string userId = User.Identity.GetUserId();
+            string username = User.Identity.GetUserName();
 
-            // Check if registered
-            if (_registrationRepository.GetRegistration(id, userId) == null)
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            try
             {
-                TempData["ErrorMessage"] = "You are not registered for this event.";
+                // Call the API
+                var response = await _apiClient.PostAsync<object, dynamic>(
+                    $"api/events/{id}/cancel-registration",
+                    null,
+                    username,
+                    roles.ToArray());
+
+                if (response.Success)
+                {
+                    TempData["SuccessMessage"] = response.Message;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = response.Message;
+                }
+
                 return RedirectToAction("Details", new { id });
             }
-
-            _registrationRepository.CancelRegistration(id, userId);
-            TempData["SuccessMessage"] = "Your registration has been canceled.";
-
-            return RedirectToAction("Details", new { id });
+            catch (Exception ex)
+            {
+                // Log the exception
+                TempData["ErrorMessage"] = "An error occurred while canceling your registration.";
+                return RedirectToAction("Details", new { id });
+            }
         }
 
         // GET: Event/MyEvents
-        public ActionResult MyEvents()
+        public async Task<ActionResult> MyEvents()
         {
-            string userId = User.Identity.GetUserId();
-            var events = _eventRepository.GetEventsByCreator(userId);
-            return View(events);
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            try
+            {
+                // Call the API
+                var response = await _apiClient.GetAsync<dynamic>(
+                    "api/events/my-events",
+                    username,
+                    roles.ToArray());
+
+                // Convert the dynamic response to a list of Event objects
+                var events = new List<Event>();
+                if (response.Events == null)
+                {
+                    return View(events);
+                }
+
+
+                foreach (var item in response.Events)
+                {
+                    events.Add(new Event
+                    {
+                        EventId = item.EventId,
+                        Name = item.Name,
+                        Description = item.Description,
+                        EventDate = item.EventDate,
+                        Location = item.Location,
+                        MaxAttendees = item.MaxAttendees,
+                        CreatedBy = item.CreatedBy,
+                        CreatedDate = item.CreatedDate
+                    });
+                }
+
+                return View(events);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return View("Error");
+            }
         }
 
         // GET: Event/MyRegistrations
-        public ActionResult MyRegistrations()
+        public async Task<ActionResult> MyRegistrations()
         {
-            string userId = User.Identity.GetUserId();
-            var registrations = _registrationRepository.GetRegistrationsByUserId(userId);
-            return View(registrations);
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            try
+            {
+                // Call the API
+                var response = await _apiClient.GetAsync<dynamic>(
+                    "api/events/my-registrations",
+                    username,
+                    roles.ToArray());
+
+                // Convert the dynamic response to a list of Registration objects
+                var registrations = new List<Registration>();
+                if (response.Registrations == null)
+                {
+                    return View(registrations);
+                }
+                foreach (var item in response.Registrations)
+                {
+                    var registration = new Registration
+                    {
+                        RegistrationId = item.RegistrationId,
+                        EventId = item.EventId,
+                        UserId = item.UserId,
+                        RegistrationDate = item.RegistrationDate
+                    };
+
+                    if (item.Event != null)
+                    {
+                        registration.Event = new Event
+                        {
+                            EventId = item.Event.EventId,
+                            Name = item.Event.Name,
+                            Description = item.Event.Description,
+                            EventDate = item.Event.EventDate,
+                            Location = item.Event.Location,
+                            MaxAttendees = item.Event.MaxAttendees,
+                            CreatedBy = item.Event.CreatedBy,
+                            CreatedDate = item.Event.CreatedDate
+                        };
+                    }
+
+                    registrations.Add(registration);
+                }
+
+                return View(registrations);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return View("Error");
+            }
         }
     }
 }
