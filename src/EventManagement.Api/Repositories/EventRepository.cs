@@ -68,4 +68,46 @@ public class EventRepository : IEventRepository
         var query = "SELECT COUNT(*) FROM Registrations WHERE EventId = @EventId";
         return await _connection.ExecuteScalarAsync<int>(query, new { EventId = eventId });
     }
+
+    public async Task<IEnumerable<Event>> GetFeaturedEventsAsync()
+    {
+        var query = @"
+            SELECT e.*, 
+            (SELECT COUNT(*) FROM Registrations r WHERE r.EventId = e.EventId) AS RegistrationCount
+            FROM Events e
+            ORDER BY e.EventDate
+            LIMIT 3";
+        return await _connection.QueryAsync<Event>(query);
+    }
+    
+    public async Task<int> GetActiveEventsCountAsync()
+    {
+        var query = @"
+            SELECT COUNT(*) 
+            FROM Events
+            WHERE EventDate > CURRENT_TIMESTAMP";
+            
+        return await _connection.ExecuteScalarAsync<int>(query);
+    }
+    
+    public async Task<int> GetThisWeekEventsCountAsync()
+    {
+        var query = @"
+            SELECT COUNT(*) 
+            FROM Events
+            WHERE EventDate BETWEEN CURRENT_TIMESTAMP AND DATE('now', '+7 days')";
+            
+        return await _connection.ExecuteScalarAsync<int>(query);
+    }
+    
+    public async Task<int> GetRegisteredUsersForFutureEventsCountAsync()
+    {
+        var query = @"
+            SELECT COUNT(RegistrationId) 
+            FROM Registrations r 
+            JOIN Events e ON r.EventId = e.EventId
+            WHERE EventDate > CURRENT_TIMESTAMP";
+            
+        return await _connection.ExecuteScalarAsync<int>(query);
+    }
 }

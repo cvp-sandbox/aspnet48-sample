@@ -36,7 +36,7 @@ public interface IApiClient
                 _httpClient.DefaultRequestHeaders.Add("X-Role", role);
             }
 
-            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{endpoint}");
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{endpoint}").ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
@@ -64,11 +64,11 @@ public interface IApiClient
         
         if (method == HttpMethod.Put)
         {
-            response = await _httpClient.PutAsync($"{_apiBaseUrl}/{endpoint}", jsonContent);
+            response = await _httpClient.PutAsync($"{_apiBaseUrl}/{endpoint}", jsonContent).ConfigureAwait(false);
         }
         else
         {
-            response = await _httpClient.PostAsync($"{_apiBaseUrl}/{endpoint}", jsonContent);
+            response = await _httpClient.PostAsync($"{_apiBaseUrl}/{endpoint}", jsonContent).ConfigureAwait(false);
         }
         
         response.EnsureSuccessStatusCode();
@@ -87,7 +87,7 @@ public interface IApiClient
             _httpClient.DefaultRequestHeaders.Add("X-Role", role);
         }
 
-        var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/{endpoint}");
+        var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/{endpoint}").ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
     }

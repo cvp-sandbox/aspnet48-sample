@@ -1,3 +1,4 @@
+using EventManagement.Api.Features.Events.GetUpcomingEvents;
 using EventManagement.Api.Models;
 
 namespace EventManagement.Api.Repositories;
@@ -9,4 +10,5 @@ public interface IRegistrationRepository
     Task<Registration?> GetRegistrationAsync(int eventId, string userId);
     Task<int> CreateRegistrationAsync(Registration registration);
     Task<bool> CancelRegistrationAsync(int eventId, string userId);
+    Task<IEnumerable<RegistrationWithEvent>> GetUpcomingEventsByUsernameAsync(string username);
 }

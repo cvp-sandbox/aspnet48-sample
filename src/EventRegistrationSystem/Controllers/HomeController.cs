@@ -1,8 +1,13 @@
 ﻿﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using EventRegistrationSystem.Models;
+using EventRegistrationSystem.Models.Api;
 using EventRegistrationSystem.Repositories;
-using System.Data;
+using EventRegistrationSystem.Utils;
+using Microsoft.AspNet.Identity;
+using EventRegistrationSystem.Authorization;
 using EventRegistrationSystem.Data;
 using Dapper;
 
@@ -11,29 +16,31 @@ namespace EventRegistrationSystem.Controllers
     public class HomeController : Controller
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IApiClient _apiClient;
 
-        public HomeController(IEventRepository eventRepository)
+        public HomeController(IEventRepository eventRepository, IApiClient apiClient)
         {
             _eventRepository = eventRepository;
+            _apiClient = apiClient;
         }
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            // Get featured events using the provided SQL query
-            IEnumerable<Event> featuredEvents;
-            
-            using (var connection = DatabaseConfig.GetConnection())
-            {
-                connection.Open();
-                featuredEvents = connection.Query<Event>(@"
-                    SELECT e.*, 
-                    (SELECT COUNT(*) FROM Registrations r WHERE r.EventId = e.EventId) AS RegistrationCount
-                    FROM Events e
-                    ORDER BY e.EventDate
-                    LIMIT 3");
-            }
-            
-            ViewBag.FeaturedEvents = featuredEvents;
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            // Call the API
+            var response = await _apiClient.GetAsync<GetFeaturedEventsResponse>(
+                "api/events/featured",
+                username,
+                roles.ToArray());
+
+            ViewBag.FeaturedEvents = response.Events;
             return View();
         }
 
@@ -51,55 +58,55 @@ namespace EventRegistrationSystem.Controllers
             return View();
         }
 
+        [ChildActionOnly]
         public ActionResult _FeaturedEvents()
         {
-            // Get featured events using the provided SQL query
-            IEnumerable<Event> featuredEvents;
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            // Call the API synchronously
+            var task = _apiClient.GetAsync<GetFeaturedEventsResponse>(
+                "api/events/featured",
+                username,
+                roles.ToArray());
             
-            using (var connection = DatabaseConfig.GetConnection())
-            {
-                connection.Open();
-                featuredEvents = connection.Query<Event>(@"
-                    SELECT e.*, 
-                    (SELECT COUNT(*) FROM Registrations r WHERE r.EventId = e.EventId) AS RegistrationCount
-                    FROM Events e
-                    ORDER BY e.EventDate
-                    LIMIT 3");
-            }
+            // Wait for the result - this is not ideal but necessary for child actions
+            task.Wait();
+            var response = task.Result;
             
-            return PartialView(featuredEvents);
+            return PartialView(response.Events);
         }
 
+        [ChildActionOnly]
         public ActionResult _Stats()
         {
-            // Get stats data using the provided SQL query
-            dynamic stats;
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            // Call the API synchronously
+            var task = _apiClient.GetAsync<GetStatsResponse>(
+                "api/events/stats",
+                username,
+                roles.ToArray());
             
-            using (var connection = DatabaseConfig.GetConnection())
-            {
-                connection.Open();
-                stats = connection.Query(@"
-                    select 'ActiveEvents' as StatLabel, count(*) AS StatValue
-                    from Events
-                    where EventDate > CURRENT_TIMESTAMP
-
-                    UNION
-
-                    select 'ThisWeeksEvents' as StatLabel, count(*) as StatValue
-                    from Events
-                    WHERE EventDate BETWEEN CURRENT_TIMESTAMP AND DATE('now', '+7 days')
-
-                    UNION
-
-                    select 'RegisteredUsers' as StatLabel, Count(RegistrationId) as StatValue
-                    from Registrations r 
-                    join Events e on r.EventId = e.EventId
-                    where EventDate > CURRENT_TIMESTAMP");
-            }
+            // Wait for the result - this is not ideal but necessary for child actions
+            task.Wait();
+            var response = task.Result;
             
-            return PartialView(stats);
+            return PartialView(response.Stats);
         }
 
+        [ChildActionOnly]
         public ActionResult _UpcomingEvents()
         {
             // If user is not authenticated, return empty result
@@ -108,29 +115,36 @@ namespace EventRegistrationSystem.Controllers
                 return PartialView(new List<Registration>());
             }
 
-            // Get user's upcoming events using the provided SQL query
-            IEnumerable<Registration> upcomingEvents;
+            string username = User.Identity.GetUserName();
+
+            // Get user roles
+            var roles = new List<string>();
+            if (User.IsInRole(Roles.Admin)) roles.Add(Roles.Admin);
+            if (User.IsInRole(Roles.Organizer)) roles.Add(Roles.Organizer);
+            if (User.IsInRole(Roles.User)) roles.Add(Roles.User);
+
+            // Call the API synchronously
+            var task = _apiClient.GetAsync<GetUpcomingEventsResponse>(
+                "api/events/upcoming",
+                username,
+                roles.ToArray());
             
-            using (var connection = DatabaseConfig.GetConnection())
+            // Wait for the result - this is not ideal but necessary for child actions
+            task.Wait();
+            var response = task.Result;
+            
+            // Convert API model to view model
+            var registrations = response.Registrations.Select(r => new Registration
             {
-                connection.Open();
-                upcomingEvents = connection.Query<Registration, Event, Registration>(@"
-                    SELECT r.*, e.*
-                    FROM Registrations r
-                    JOIN Events e ON r.EventId = e.EventId
-                    JOIN AspNetUsers u on u.Id = r.UserId
-                    WHERE u.UserName = @UserName AND e.EventDate BETWEEN CURRENT_TIMESTAMP AND DATE('now', '+7 days')
-                    ORDER BY e.EventDate DESC",
-                    (registration, eventItem) => 
-                    {
-                        registration.Event = eventItem;
-                        return registration;
-                    },
-                    new { UserName = User.Identity.Name },
-                    splitOn: "EventId");
-            }
+                RegistrationId = r.RegistrationId,
+                EventId = r.EventId,
+                UserId = r.UserId,
+                RegistrationDate = r.RegistrationDate,
+                UserName = r.UserName,
+                Event = r.Event
+            }).ToList();
             
-            return PartialView(upcomingEvents);
+            return PartialView(registrations);
         }
     }
 }

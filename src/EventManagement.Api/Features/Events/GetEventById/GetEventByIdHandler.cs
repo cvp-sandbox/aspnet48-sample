@@ -1,4 +1,5 @@
 using EventManagement.Api.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace EventManagement.Api.Features.Events.GetEventById;
 

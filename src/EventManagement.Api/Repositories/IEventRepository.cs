@@ -11,4 +11,10 @@ public interface IEventRepository
     Task<bool> UpdateEventAsync(Event eventEntity);
     Task<bool> DeleteEventAsync(int eventId);
     Task<int> GetRegistrationCountAsync(int eventId);
+    Task<IEnumerable<Event>> GetFeaturedEventsAsync();
+    
+    // Stats methods
+    Task<int> GetActiveEventsCountAsync();
+    Task<int> GetThisWeekEventsCountAsync();
+    Task<int> GetRegisteredUsersForFutureEventsCountAsync();
 }

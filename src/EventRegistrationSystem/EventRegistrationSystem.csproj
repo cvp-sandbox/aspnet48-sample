@@ -199,7 +199,17 @@
     </Compile>
     <Compile Include="Identity\SqliteUserStore.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\Api\ApiModels.cs" />
+    <Compile Include="Models\Api\CancelRegistrationResponse.cs" />
+    <Compile Include="Models\Api\CreateEventResponse.cs" />
+    <Compile Include="Models\Api\GetAllEventsResponse.cs" />
+    <Compile Include="Models\Api\GetEventByIdResponse.cs" />
+    <Compile Include="Models\Api\GetEventsByCreatorResponse.cs" />
+    <Compile Include="Models\Api\GetFeaturedEventsResponse.cs" />
+    <Compile Include="Models\Api\GetRegistrationsByUserIdResponse.cs" />
+    <Compile Include="Models\Api\GetStatsResponse.cs" />
+    <Compile Include="Models\Api\GetUpcomingEventsResponse.cs" />
+    <Compile Include="Models\Api\RegisterForEventResponse.cs" />
+    <Compile Include="Models\Api\UpdateEventResponse.cs" />
     <Compile Include="Models\EventModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -293,6 +303,9 @@
     <Content Include="Views\Event\MyRegistrations.cshtml" />
     <Content Include="Views\Admin\Users.cshtml" />
     <Content Include="Views\Admin\UserRoles.cshtml" />
+    <Content Include="Views\Home\_FeaturedEvents.cshtml" />
+    <Content Include="Views\Home\_Stats.cshtml" />
+    <Content Include="Views\Home\_UpcomingEvents.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

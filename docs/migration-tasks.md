@@ -24,6 +24,23 @@ NOTE: We have successfully created the `EventManagement.Api` project with a work
    - ✅ GetEventById integration test
 5. ✅ Update the legacy `EventController` to call the new WebAPI endpoints using `ApiClient`.
 
+## HomeController
+1. ✅ Identify all actions in `HomeController` (`Index`, `_FeaturedEvents`, `_Stats`, `_UpcomingEvents`) and their corresponding business logic.
+2. ✅ Create new request handlers in `EventManagement.Api` for each action in `HomeController`:
+   - ✅ GetFeaturedEvents
+   - ✅ GetStats
+   - ✅ GetUpcomingEvents
+3. ✅ Implement unit tests for each new request handler using Xunit and NSubstitute:
+   - ✅ GetFeaturedEventsHandler tests
+   - ✅ GetStatsHandler tests
+   - ✅ GetUpcomingEventsHandler tests
+4. ✅ Implement integration tests for each new request handler.
+5. ✅ Update the legacy `HomeController` to call the new WebAPI endpoints using `ApiClient`:
+   - ✅ Index action (using GetFeaturedEvents endpoint)
+   - ✅ _Stats action (using GetStats endpoint)
+   - ✅ _FeaturedEvents action (using GetFeaturedEvents endpoint)
+   - ✅ _UpcomingEvents action (using GetUpcomingEvents endpoint)
+
 ## AccountController
 1. Identify all actions in `AccountController` (`Login`, `LogOff`, `Register`) and their corresponding business logic.
 2. Create new request handlers in `EventManagement.Api` for each action in `AccountController`.
@@ -31,15 +48,11 @@ NOTE: We have successfully created the `EventManagement.Api` project with a work
 4. Implement integration tests for each new request handler.
 5. Update the legacy `AccountController` to call the new WebAPI endpoints using `ApiClient`.
 
-## HomeController
-1. Identify all actions in `HomeController` (`Index`, `_FeaturedEvents`, `_Stats`, `_UpcomingEvents`) and their corresponding business logic.
-2. Create new request handlers in `EventManagement.Api` for each action in `HomeController`.
-3. Implement unit tests for each new request handler using Xunit and NSubstitute.
-4. Implement integration tests for each new request handler.
-5. Update the legacy `HomeController` to call the new WebAPI endpoints using `ApiClient`.
-
 ## General Tasks
 1. Ensure consistent authorization policies between the legacy application and the new WebAPI.
 2. Verify that the shared Sqlite database (`_db\EventRegistration.db`) is correctly accessed by both the legacy application and the WebAPI.
 3. Perform end-to-end testing to confirm the functionality of migrated business logic.
 4. Update documentation to reflect the migration of business logic.
+5. Be consistent with implementation
+
+

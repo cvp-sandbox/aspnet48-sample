@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,6 +10,7 @@ using EventRegistrationSystem.Models.Api;
 using EventRegistrationSystem.Repositories;
 using EventRegistrationSystem.Utils;
 using Microsoft.AspNet.Identity;
+
 
 namespace EventRegistrationSystem.Controllers
 {
@@ -71,7 +72,7 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.GetAsync<dynamic>(
+                var response = await _apiClient.GetAsync<GetEventByIdResponse>(
                     $"api/events/{id}",
                     username,
                     roles.ToArray());
@@ -81,7 +82,7 @@ namespace EventRegistrationSystem.Controllers
                     return HttpNotFound();
                 }
 
-                // Convert the dynamic response to an Event object
+                // Convert the DTO to an Event object
                 var eventEntity = new Event
                 {
                     EventId = response.Event.EventId,
@@ -142,14 +143,14 @@ namespace EventRegistrationSystem.Controllers
                         MaxAttendees = eventEntity.MaxAttendees
                     };
 
-                    // Call the API
-                    var response = await _apiClient.PostAsync<object, dynamic>(
-                        "api/events",
-                        requestData,
-                        username,
-                        roles.ToArray());
+                // Call the API
+                var response = await _apiClient.PostAsync<object, Models.Api.CreateEventResponse>(
+                    "api/events",
+                    requestData,
+                    username,
+                    roles.ToArray());
 
-                    return RedirectToAction("Details", new { id = response.EventId });
+                return RedirectToAction("Details", new { id = response.EventId });
                 }
                 catch (Exception ex)
                 {
@@ -176,7 +177,7 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.GetAsync<dynamic>(
+                var response = await _apiClient.GetAsync<Models.Api.GetEventByIdResponse>(
                     $"api/events/{id}",
                     username,
                     roles.ToArray());
@@ -192,7 +193,7 @@ namespace EventRegistrationSystem.Controllers
                     return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
                 }
 
-                // Convert the dynamic response to an Event object
+                // Convert the DTO to an Event object
                 var eventEntity = new Event
                 {
                     EventId = response.Event.EventId,
@@ -244,7 +245,7 @@ namespace EventRegistrationSystem.Controllers
                     };
 
                     // Call the API
-                    await _apiClient.PostAsync<object, dynamic>(
+                    await _apiClient.PostAsync<object, Models.Api.UpdateEventResponse>(
                         $"api/events/{eventEntity.EventId}",
                         requestData,
                         username,
@@ -282,7 +283,7 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.GetAsync<dynamic>(
+                var response = await _apiClient.GetAsync<Models.Api.GetEventByIdResponse>(
                     $"api/events/{id}",
                     username,
                     roles.ToArray());
@@ -298,7 +299,7 @@ namespace EventRegistrationSystem.Controllers
                     return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
                 }
 
-                // Convert the dynamic response to an Event object
+                // Convert the DTO to an Event object
                 var eventEntity = new Event
                 {
                     EventId = response.Event.EventId,
@@ -371,7 +372,7 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.PostAsync<object, dynamic>(
+                var response = await _apiClient.PostAsync<object, Models.Api.RegisterForEventResponse>(
                     $"api/events/{id}/register",
                     null,
                     username,
@@ -412,7 +413,7 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.PostAsync<object, dynamic>(
+                var response = await _apiClient.PostAsync<object, Models.Api.CancelRegistrationResponse>(
                     $"api/events/{id}/cancel-registration",
                     null,
                     username,
@@ -451,12 +452,12 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.GetAsync<dynamic>(
+                var response = await _apiClient.GetAsync<Models.Api.GetEventsByCreatorResponse>(
                     "api/events/my-events",
                     username,
                     roles.ToArray());
 
-                // Convert the dynamic response to a list of Event objects
+                // Convert the DTOs to a list of Event objects
                 var events = new List<Event>();
                 if (response.Events == null)
                 {
@@ -502,12 +503,12 @@ namespace EventRegistrationSystem.Controllers
             try
             {
                 // Call the API
-                var response = await _apiClient.GetAsync<dynamic>(
+                var response = await _apiClient.GetAsync<Models.Api.GetRegistrationsByUserIdResponse>(
                     "api/events/my-registrations",
                     username,
                     roles.ToArray());
 
-                // Convert the dynamic response to a list of Registration objects
+                // Convert the DTOs to a list of Registration objects
                 var registrations = new List<Registration>();
                 if (response.Registrations == null)
                 {
