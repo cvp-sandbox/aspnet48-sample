@@ -10,6 +10,9 @@ using EventRegistrationSystem.Repositories;
 using Microsoft.AspNet.Identity.EntityFramework;
 using EventRegistrationSystem.Identity;
 using Unity;
+using EventRegistrationSystem.Utils;
+using EventRegistrationSystem.Models.Api;
+using System;
 
 namespace EventRegistrationSystem.Controllers
 {
@@ -19,10 +22,12 @@ namespace EventRegistrationSystem.Controllers
 
 
         private readonly IAuthenticationManager _authenticationManager;
+        private readonly IApiClient _apiClient;
 
-        public AccountController(IAuthenticationManager authenticationManager = null)
+        public AccountController(IAuthenticationManager authenticationManager = null, IApiClient apiClient = null)
         {
             _authenticationManager = authenticationManager;
+            _apiClient = apiClient ?? DependencyResolver.Current.GetService<IApiClient>();
         }
 
 
@@ -53,21 +58,56 @@ namespace EventRegistrationSystem.Controllers
                 return View(model);
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
+            try
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
+                // Call the API to authenticate the user
+                var loginRequest = new
+                {
+                    Email = model.Email,
+                    Password = model.Password,
+                    ReturnUrl = returnUrl
+                };
+
+                // For login, we don't have a user context yet, so pass empty values
+                var response = await _apiClient.PostAsync<object, LoginResponse>(
+                    "api/users/login", 
+                    loginRequest, 
+                    string.Empty, 
+                    new string[] { });
+
+                if (response.Success)
+                {
+                    // Sign in the user using ASP.NET Identity
+                    var user = await UserManager.FindByEmailAsync(model.Email);
+                    await SignInManager.SignInAsync(user, model.RememberMe, false);
+                    
+                    return RedirectToLocal(response.ReturnUrl);
+                }
+                else
+                {
+                    ModelState.AddModelError("", response.ErrorMessage ?? "Invalid login attempt.");
                     return View(model);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+
+                // Fallback to the original implementation if API call fails
+                var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                switch (result)
+                {
+                    case SignInStatus.Success:
+                        return RedirectToLocal(returnUrl);
+                    case SignInStatus.LockedOut:
+                        return View("Lockout");
+                    case SignInStatus.RequiresVerification:
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    case SignInStatus.Failure:
+                    default:
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+                }
             }
         }
 
@@ -129,8 +169,55 @@ namespace EventRegistrationSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            try
+            {
+                // Call the API to register the user
+                var registerRequest = new
+                {
+                    Email = model.Email,
+                    Password = model.Password,
+                    ConfirmPassword = model.ConfirmPassword
+                };
+
+                // For registration, we don't have a user context yet, so pass empty values
+                var response = await _apiClient.PostAsync<object, RegisterResponse>(
+                    "api/users/register", 
+                    registerRequest, 
+                    string.Empty, 
+                    new string[] { });
+
+                if (response.Success)
+                {
+                    // Sign in the user using ASP.NET Identity
+                    var user = await UserManager.FindByEmailAsync(model.Email);
+                    if (user == null)
+                    {
+                        // If the user doesn't exist in the local database yet, create it
+                        user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                        await UserManager.CreateAsync(user);
+                    }
+                    
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    foreach (var error in response.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+                    return View(model);
+                }
+            }
+            catch
+            {
+                // Fallback to the original implementation if API call fails
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -139,9 +226,6 @@ namespace EventRegistrationSystem.Controllers
 
                     // Check if this is the first user
                     var roleRepository = DependencyResolver.Current.GetService<IRoleRepository>();
-                    //var userStore = new UserStore<ApplicationUser>(new ApplicationDbContext());
-                    //bool isFirstUser = userStore.Users.Count() == 1;
-
                     bool isFirstUser = await IsFirstUserAsync();
 
                     // Add user to default role
@@ -152,13 +236,6 @@ namespace EventRegistrationSystem.Controllers
                     {
                         roleRepository.AddUserToRole(user.Id, Authorization.Roles.Admin);
                     }
-
-
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -393,8 +470,32 @@ namespace EventRegistrationSystem.Controllers
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult LogOff()
+        public async Task<ActionResult> LogOff()
         {
+            try
+            {
+                // Get current user info
+                var username = User.Identity.Name;
+                var roles = User.Identity.IsAuthenticated ? 
+                    ((System.Security.Claims.ClaimsIdentity)User.Identity).Claims
+                        .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+                        .Select(c => c.Value)
+                        .ToArray() : 
+                    new string[] { };
+
+                // Call the API to log off
+                await _apiClient.PostAsync<object, LogOffResponse>(
+                    "api/users/logoff", 
+                    null, 
+                    username, 
+                    roles);
+            }
+            catch
+            {
+                // If API call fails, continue with local sign out
+            }
+            
+            // Sign out locally regardless of API result
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }

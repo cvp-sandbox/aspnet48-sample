@@ -208,7 +208,10 @@
     <Compile Include="Models\Api\GetRegistrationsByUserIdResponse.cs" />
     <Compile Include="Models\Api\GetStatsResponse.cs" />
     <Compile Include="Models\Api\GetUpcomingEventsResponse.cs" />
+    <Compile Include="Models\Api\LoginResponse.cs" />
+    <Compile Include="Models\Api\LogOffResponse.cs" />
     <Compile Include="Models\Api\RegisterForEventResponse.cs" />
+    <Compile Include="Models\Api\RegisterResponse.cs" />
     <Compile Include="Models\Api\UpdateEventResponse.cs" />
     <Compile Include="Models\EventModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />

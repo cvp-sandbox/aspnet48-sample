@@ -1,6 +1,7 @@
 using EventManagement.Api.Common.DependencyInjection;
 using EventManagement.Api.Configuration;
 using EventManagement.Api.Features.Events;
+using EventManagement.Api.Features.Users;
 using Scalar.AspNetCore;
 
 // Load environment variables from .env file
@@ -31,6 +32,7 @@ builder.Services.AddSqliteConnection(builder.Configuration);
 
 // Add feature modules
 builder.Services.AddEventsModule();
+builder.Services.AddUsersModule();
 
 
 
@@ -54,6 +56,7 @@ app.UseHeaderAuthentication();
 
 // Map endpoints
 app.MapEventsEndpoints();
+app.MapUsersEndpoints();
 
 // Map service defaults (health checks, etc.)
 app.MapDefaultEndpoints();

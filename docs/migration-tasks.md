@@ -42,11 +42,40 @@ NOTE: We have successfully created the `EventManagement.Api` project with a work
    - ✅ _UpcomingEvents action (using GetUpcomingEvents endpoint)
 
 ## AccountController
-1. Identify all actions in `AccountController` (`Login`, `LogOff`, `Register`) and their corresponding business logic.
-2. Create new request handlers in `EventManagement.Api` for each action in `AccountController`.
-3. Implement unit tests for each new request handler using Xunit and NSubstitute.
-4. Implement integration tests for each new request handler.
-5. Update the legacy `AccountController` to call the new WebAPI endpoints using `ApiClient`.
+1. ✅ Identify all actions in `AccountController` (`Login`, `LogOff`, `Register`) and their corresponding business logic.
+2. ✅ Create new request handlers in `EventManagement.Api` for each action in `AccountController`:
+   - ✅ Create Users module structure in `src/EventManagement.Api/Features/Users/`
+   - ✅ Create `Login` feature:
+     - ✅ LoginRequest.cs
+     - ✅ LoginResponse.cs
+     - ✅ LoginHandler.cs
+     - ✅ LoginEndpoint.cs
+   - ✅ Create `Register` feature:
+     - ✅ RegisterRequest.cs
+     - ✅ RegisterResponse.cs
+     - ✅ RegisterHandler.cs
+     - ✅ RegisterEndpoint.cs
+   - ✅ Create `LogOff` feature:
+     - ✅ LogOffRequest.cs
+     - ✅ LogOffResponse.cs
+     - ✅ LogOffHandler.cs
+     - ✅ LogOffEndpoint.cs
+   - ✅ Create user repositories:
+     - ✅ IUserRepository.cs
+     - ✅ UserRepository.cs
+     - ✅ IRoleRepository.cs
+     - ✅ RoleRepository.cs
+   - ✅ Update Program.cs to register and map Users module
+3. ✅ Implement unit tests for each new request handler using Xunit and NSubstitute:
+   - ✅ LoginHandlerTests.cs
+   - ✅ RegisterHandlerTests.cs
+   - ✅ LogOffHandlerTests.cs
+4. ✅ Implement integration tests for each new request handler:
+   - ✅ UsersApiTests.cs
+5. ✅ Update the legacy `AccountController` to call the new WebAPI endpoints using `ApiClient`:
+   - ✅ Update Login action
+   - ✅ Update LogOff action
+   - ✅ Update Register action
 
 ## General Tasks
 1. Ensure consistent authorization policies between the legacy application and the new WebAPI.
@@ -54,5 +83,3 @@ NOTE: We have successfully created the `EventManagement.Api` project with a work
 3. Perform end-to-end testing to confirm the functionality of migrated business logic.
 4. Update documentation to reflect the migration of business logic.
 5. Be consistent with implementation
-
-
