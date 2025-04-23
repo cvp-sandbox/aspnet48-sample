@@ -232,6 +232,12 @@ app.MapControllerRoute(
     pattern: "/Account/Register/{*pathInfo}",
     defaults: new { controller = "Account", action = "Register" });
 
+// Map Event controller routes
+app.MapControllerRoute(
+    name: "event-index",
+    pattern: "/Event/{action=Index}/{id?}",
+    defaults: new { controller = "Event" });
+
 
 // Map the Home controller to the root URL without including /Home in the URL
 app.MapControllerRoute(

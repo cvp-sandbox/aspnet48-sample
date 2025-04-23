@@ -8,7 +8,7 @@ This document tracks the progress of migrating controller actions from the legac
 |------------|----------|-------|
 | HomeController | 100% | All actions migrated |
 | AccountController | 100% | Login, Logout, and Register migrated (other actions not needed) |
-| EventController | 0% | Not started |
+| EventController | 12.5% | Index action migrated |
 | AdminController | N/A | Will be skipped |
 | ManageController | N/A | Will be skipped |
 
@@ -38,11 +38,11 @@ This document tracks the progress of migrating controller actions from the legac
 | ConfirmEmail | ❌ Not Needed | Not required for this application |
 | ExternalLogin* | ❌ Not Needed | Not required for this application |
 
-### EventController (0% Complete)
+### EventController (12.5% Complete)
 
 | Action | Status | Notes |
 |--------|--------|-------|
-| Index | ⬜ Not Started | |
+| Index | ✅ Complete | List of all events |
 | Details | ⬜ Not Started | |
 | Create | ⬜ Not Started | |
 | Edit | ⬜ Not Started | |
@@ -54,9 +54,9 @@ This document tracks the progress of migrating controller actions from the legac
 
 ## Next Actions
 
-1. **EventController.Index** (next action to be migrated)
-   - Implement EventController with Index action
-   - Create Index.cshtml view
+1. **EventController.Details** (next action to be migrated)
+   - Implement EventController with Details action
+   - Create Details.cshtml view
    - Update YARP configuration
 
 ## Migration Checklist Template

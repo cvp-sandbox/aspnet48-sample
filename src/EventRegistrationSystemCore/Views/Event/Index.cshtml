@@ -1,0 +1,55 @@
+@model IEnumerable<EventRegistrationSystemCore.Models.Event>
+
+@{
+    ViewData["Title"] = "All Events";
+}
+
+<h2>All Events</h2>
+
+<p>
+    @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
+    {
+        <a asp-action="Create" class="btn btn-primary">Create New Event</a>
+    }
+</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title">@item.Name</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Date:</strong> @item.EventDate.ToString("MMMM d, yyyy")</p>
+                    <p><strong>Location:</strong> @item.Location</p>
+                    <p>
+                        <strong>Registrations:</strong> @item.RegistrationCount
+                        @if (item.MaxAttendees > 0)
+                        {
+                            <span>/ @item.MaxAttendees</span>
+                        }
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-info btn-sm">Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
