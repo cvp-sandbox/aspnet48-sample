@@ -62,6 +62,7 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 // Register repository services
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 // Configure Identity
 // Add required Identity services
@@ -215,7 +216,7 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-// Map Account Login and Logout for new app
+// Map Account Login, Logout, and Register for new app
 app.MapControllerRoute(
     name: "account-login",
     pattern: "/Account/Login/{*pathInfo}",
@@ -225,6 +226,11 @@ app.MapControllerRoute(
     name: "account-logout",
     pattern: "/Account/Logout/{*pathInfo}",
     defaults: new { controller = "Account", action = "Logout" });
+
+app.MapControllerRoute(
+    name: "account-register",
+    pattern: "/Account/Register/{*pathInfo}",
+    defaults: new { controller = "Account", action = "Register" });
 
 
 // Map the Home controller to the root URL without including /Home in the URL
@@ -251,8 +257,10 @@ app.MapReverseProxy(proxyPipeline =>
 {
     proxyPipeline.Use(async (context, next) =>
     {
-        // Skip Account/Login routes
-        if (context.Request.Path.StartsWithSegments("/Account/Login") || context.Request.Path.StartsWithSegments("/Home"))
+        // Skip Account/Login, Account/Register, and Home routes
+        if (context.Request.Path.StartsWithSegments("/Account/Login") || 
+            context.Request.Path.StartsWithSegments("/Account/Register") || 
+            context.Request.Path.StartsWithSegments("/Home"))
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             return;

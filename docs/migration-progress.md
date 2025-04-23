@@ -7,7 +7,7 @@ This document tracks the progress of migrating controller actions from the legac
 | Controller | Progress | Notes |
 |------------|----------|-------|
 | HomeController | 100% | All actions migrated |
-| AccountController | 40% | Login and Logout migrated, Register in progress |
+| AccountController | 100% | Login, Logout, and Register migrated (other actions not needed) |
 | EventController | 0% | Not started |
 | AdminController | N/A | Will be skipped |
 | ManageController | N/A | Will be skipped |
@@ -26,17 +26,17 @@ This document tracks the progress of migrating controller actions from the legac
 | FeaturedEvents | ✅ Complete | Implemented as ViewComponent |
 | UpcomingEvents | ✅ Complete | Implemented as ViewComponent |
 
-### AccountController (40% Complete)
+### AccountController (100% Complete)
 
 | Action | Status | Notes |
 |--------|--------|-------|
 | Login | ✅ Complete | Using custom SQLiteUserStore |
 | Logout | ✅ Complete | Using ASP.NET Core authentication |
-| Register | 🔄 In Progress | Next action to be migrated |
-| ForgotPassword | ⬜ Not Started | |
-| ResetPassword | ⬜ Not Started | |
-| ConfirmEmail | ⬜ Not Started | |
-| ExternalLogin* | ⬜ Not Started | Low priority |
+| Register | ✅ Complete | Using custom SQLiteUserStore and RoleRepository |
+| ForgotPassword | ❌ Not Needed | Not required for this application |
+| ResetPassword | ❌ Not Needed | Not required for this application |
+| ConfirmEmail | ❌ Not Needed | Not required for this application |
+| ExternalLogin* | ❌ Not Needed | Not required for this application |
 
 ### EventController (0% Complete)
 
@@ -54,13 +54,7 @@ This document tracks the progress of migrating controller actions from the legac
 
 ## Next Actions
 
-1. **AccountController.Register**
-   - Create RegisterViewModel
-   - Implement Register action
-   - Create Register.cshtml view
-   - Update YARP configuration
-
-2. **EventController.Index** (after Register is complete)
+1. **EventController.Index** (next action to be migrated)
    - Implement EventController with Index action
    - Create Index.cshtml view
    - Update YARP configuration

@@ -5,17 +5,27 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Data;
+using Dapper;
 using EventRegistrationSystemCore.Models;
 using EventRegistrationSystemCore.Utils;
+using EventRegistrationSystemCore.Repositories;
 
 namespace EventRegistrationSystemCore.Controllers;
 
 public class AccountController : Controller
 {
-    private SQLiteUserStore _userStore;
-    public AccountController(SQLiteUserStore userStore)
+    private readonly SQLiteUserStore _userStore;
+    private readonly IRoleRepository _roleRepository;
+    private readonly LegacyPasswordHasher _passwordHasher;
+    private readonly IDbConnection _connection;
+
+    public AccountController(SQLiteUserStore userStore, IRoleRepository roleRepository, IDbConnection connection)
     {
         _userStore = userStore;
+        _roleRepository = roleRepository;
+        _passwordHasher = new LegacyPasswordHasher();
+        _connection = connection;
     }
 
     //
@@ -141,6 +151,105 @@ public class AccountController : Controller
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
+    }
+
+    //
+    // GET: /Account/Register
+    [AllowAnonymous]
+    public ActionResult Register()
+    {
+        return View();
+    }
+
+    //
+    // POST: /Account/Register
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Register(RegisterViewModel model, CancellationToken cancellationToken)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            
+            // Hash the password
+            user.PasswordHash = _passwordHasher.HashPassword(user, model.Password);
+            user.SecurityStamp = Guid.NewGuid().ToString();
+            
+            // Create the user
+            var result = await _userStore.CreateAsync(user, cancellationToken);
+            
+            if (result.Succeeded)
+            {
+                // Create claims for the user
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName ?? user.Email)
+                };
+
+                if (!string.IsNullOrEmpty(user.Email))
+                {
+                    claims.Add(new Claim(ClaimTypes.Email, user.Email));
+                }
+
+                // Check if this is the first user
+                bool isFirstUser = await IsFirstUserAsync(cancellationToken);
+
+                // Add user to default role
+                _roleRepository.AddUserToRole(user.Id, Roles.User);
+
+                // If first user, make them an admin
+                if (isFirstUser)
+                {
+                    _roleRepository.AddUserToRole(user.Id, Roles.Admin);
+                    claims.Add(new Claim(ClaimTypes.Role, Roles.Admin));
+                }
+
+                claims.Add(new Claim(ClaimTypes.Role, Roles.User));
+
+                // Create the identity and sign in
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTime.UtcNow.AddDays(30)
+                    });
+
+                // IMPORTANT: Manually update the current HttpContext.User
+                HttpContext.User = principal;
+
+                return RedirectToAction("Index", "Home");
+            }
+            
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+        }
+
+        // If we got this far, something failed, redisplay form
+        return View(model);
+    }
+
+    private async Task<bool> IsFirstUserAsync(CancellationToken cancellationToken)
+    {
+        // Query the database to check if this is the first user
+        _connection.Open();
+        try
+        {
+            var count = await _connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM AspNetUsers");
+            return count == 0;
+        }
+        finally
+        {
+            _connection.Close();
+        }
     }
 
     private ActionResult RedirectToLocal(string returnUrl)
