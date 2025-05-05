@@ -8,14 +8,9 @@ public static class GetFeaturedEventsEndpoint
     public static WebApplication MapGetFeaturedEventsEndpoint(this WebApplication app)
     {
         app.MapGet("/api/events/featured", async (
-        HttpContext context,
         [FromServices] GetFeaturedEventsHandler handler) =>
         {
-            // Access the authenticated user
-            var user = context.User;
-            var username = user.Identity?.Name;
-            var isAdmin = user.IsInRole(Roles.Admin.Name); 
-
+            // No authentication required for featured events
             var request = new GetFeaturedEventsRequest();
             var response = await handler.HandleAsync(request);
             

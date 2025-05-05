@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>api-first-migration.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="step-by-step-guide-migrating-from-net-framework-48-mvc-to-net-90-minimal-api-with-aspire">Step-by-Step Guide: Migrating from .NET Framework 4.8 MVC to .NET 9.0 Minimal API with Aspire</h1>
+<p>This guide will walk you through setting up a .NET 9.0 Web Minimal API project and migrating your first endpoint from the legacy ASP.NET MVC application. We'll implement the REPR pattern, set up unit testing, and configure Aspire for development orchestration.</p>
+<h2 id="step-1-set-up-solution-structure">Step 1: Set Up Solution Structure</h2>
+<ol>
+<li>Create a new solution folder structure:</li>
+</ol>
+<pre class="hljs"><code><div>EventManagementSystem/
+├── src/
+│   ├── EventManagement.Legacy/         (Existing MVC project)
+│   ├── EventManagement.Api/            (New .NET 9.0 Minimal API)
+│   └── EventManagement.Aspire.AppHost/ (Aspire host project)
+└── test/
+    └── EventManagement.Api.Tests/      (xUnit test project)
+</div></code></pre>
+<ol start="2">
+<li>Open a command prompt and navigate to your solution directory:</li>
+</ol>
+<pre class="hljs"><code><div>mkdir <span class="hljs-built_in">test</span>
+</div></code></pre>
+<h2 id="step-2-create-the-net-90-minimal-api-project">Step 2: Create the .NET 9.0 Minimal API Project</h2>
+<pre class="hljs"><code><div><span class="hljs-built_in">cd</span> src
+dotnet new web -n EventManagement.Api -f net9.0
+</div></code></pre>
+<h2 id="step-3-create-the-xunit-test-project">Step 3: Create the xUnit Test Project</h2>
+<pre class="hljs"><code><div><span class="hljs-built_in">cd</span> ../<span class="hljs-built_in">test</span>
+dotnet new xunit -n EventManagement.Api.Tests -f net9.0
+<span class="hljs-built_in">cd</span> EventManagement.Api.Tests
+dotnet add package NSubstitute
+dotnet add package FluentAssertions
+dotnet add package Microsoft.AspNetCore.Mvc.Testing
+dotnet add reference ../../src/EventManagement.Api/EventManagement.Api.csproj
+</div></code></pre>
+<h2 id="step-4-set-up-aspire-projects">Step 4: Set Up Aspire Projects</h2>
+<pre class="hljs"><code><div><span class="hljs-built_in">cd</span> ../../src
+dotnet new aspire-apphost -n EventManagement.Aspire.AppHost -f net9.0
+dotnet new aspire-servicedefaults -n EventManagement.Aspire.ServiceDefaults -f net9.0
+</div></code></pre>
+<h2 id="step-5-add-projects-to-aspire-apphost">Step 5: Add Projects to Aspire AppHost</h2>
+<pre class="hljs"><code><div><span class="hljs-built_in">cd</span> ../src/EventManagement.Aspire.AppHost
+dotnet add reference ../src/EventManagement.Api/EventManagement.Api.csproj
+dotnet add reference ../src/EventRegistrationSystem/EventRegistrationSystem.csproj
+</div></code></pre>
+<p>Edit the <code>Program.cs</code> in the <code>EventManagement.Aspire.AppHost</code> project:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> builder = DistributedApplication.CreateBuilder(args);
+
+<span class="hljs-keyword">var</span> apiService = builder.AddProject&lt;Projects.EventManagement_Api&gt;(<span class="hljs-string">"api"</span>);
+
+<span class="hljs-keyword">var</span> legacyApp = builder.AddProject&lt;Projects.EventRegistrationSystem&gt;(<span class="hljs-string">"legacy-mvc"</span>)
+                .WithEndpoint(<span class="hljs-string">"http"</span>, endpoint =&gt; {
+
+                    endpoint.Port = <span class="hljs-number">44372</span>; <span class="hljs-comment">// Match HTTP port</span>
+                    endpoint.IsProxied = <span class="hljs-literal">false</span>; <span class="hljs-comment">// Bypass Aspire's reverse proxy if needed</span>
+                    endpoint.UriScheme = <span class="hljs-string">"https"</span>;
+                });
+
+builder.Build().Run();
+</div></code></pre>
+<h2 id="step-6-update-project-references">Step 6: Update Project References</h2>
+<pre class="hljs"><code><div><span class="hljs-built_in">cd</span> EventManagement.Aspire.AppHost
+dotnet add reference ../EventManagement.Api/EventManagement.Api.csproj
+
+<span class="hljs-built_in">cd</span> ../EventManagement.Api
+dotnet add reference ../EventManagement.Aspire.ServiceDefaults/EventManagement.Aspire.ServiceDefaults.csproj
+dotnet add package Dapper
+dotnet add package Microsoft.Data.Sqlite
+</div></code></pre>
+<h2 id="step-7-set-up-the-api-project-structure-with-repr-pattern">Step 7: Set Up the API Project Structure with REPR Pattern</h2>
+<p>Create the following folder structure in the <code>EventManagement.Api</code> project:</p>
+<pre class="hljs"><code><div>EventManagement.Api/
+├── Common/
+│   └── DependencyInjection/
+│       └── DbConnectionExtensions.cs
+├── Features/
+│   └── Events/
+│       ├── GetAllEvents/
+│       │   ├── GetAllEventsEndpoint.cs
+│       │   ├── GetAllEventsRequest.cs
+│       │   ├── GetAllEventsResponse.cs
+│       │   └── GetAllEventsHandler.cs
+│       └── EventsModule.cs
+├── Models/
+│   └── Event.cs
+├── Repositories/
+│   ├── EventRepository.cs
+│   └── IEventRepository.cs
+├── Configuration/
+│   └── DotEnvReader.cs
+├── .env
+├── appsettings.json
+└── Program.cs
+</div></code></pre>
+<h2 id="step-8-implement-database-connection-configuration">Step 8: Implement Database Connection Configuration</h2>
+<p>Create the <code>DbConnectionExtensions.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> Microsoft.Data.Sqlite;
+<span class="hljs-keyword">using</span> System.Data;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Common.DependencyInjection</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">DbConnectionExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IServiceCollection <span class="hljs-title">AddSqliteConnection</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> IServiceCollection services, IConfiguration configuration</span>)</span>
+    {
+        services.AddScoped&lt;IDbConnection&gt;(sp =&gt;
+        {
+            <span class="hljs-keyword">var</span> dbPath = configuration[<span class="hljs-string">"DatabasePath"</span>];
+            <span class="hljs-keyword">var</span> connectionString = <span class="hljs-string">$"Data Source=<span class="hljs-subst">{dbPath}</span>;Version=3;"</span>;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SqliteConnection(connectionString);
+        });
+        
+        <span class="hljs-keyword">return</span> services;
+    }
+}
+</div></code></pre>
+<h2 id="step-9-implement-environment-file-reader">Step 9: Implement Environment File Reader</h2>
+<p>Create the <code>DotEnvReader.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Configuration</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">DotEnvReader</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Load</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> filePath</span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (!File.Exists(filePath))
+            <span class="hljs-keyword">return</span>;
+            
+        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> line <span class="hljs-keyword">in</span> File.ReadAllLines(filePath))
+        {
+            <span class="hljs-keyword">var</span> parts = line.Split(<span class="hljs-string">'='</span>, <span class="hljs-number">2</span>);
+            <span class="hljs-keyword">if</span> (parts.Length != <span class="hljs-number">2</span>)
+                <span class="hljs-keyword">continue</span>;
+                
+            <span class="hljs-keyword">var</span> key = parts[<span class="hljs-number">0</span>].Trim();
+            <span class="hljs-keyword">var</span> <span class="hljs-keyword">value</span> = parts[<span class="hljs-number">1</span>].Trim();
+            
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">string</span>.IsNullOrEmpty(key))
+                <span class="hljs-keyword">continue</span>;
+                
+            Environment.SetEnvironmentVariable(key, <span class="hljs-keyword">value</span>);
+        }
+    }
+}
+</div></code></pre>
+<h2 id="step-10-create-the-event-model">Step 10: Create the Event Model</h2>
+<p>Create the <code>Event.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Models</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Event</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> EventId { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Name { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; } = <span class="hljs-keyword">string</span>.Empty;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span>? Description { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> DateTime EventDate { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span>? Location { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> MaxAttendees { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> CreatedBy { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; } = <span class="hljs-keyword">string</span>.Empty;
+    <span class="hljs-keyword">public</span> DateTime CreatedDate { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+</div></code></pre>
+<h2 id="step-11-implement-event-repository">Step 11: Implement Event Repository</h2>
+<p>Create the <code>IEventRepository.cs</code> interface:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Models;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Repositories</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IEventRepository</span>
+{
+    Task&lt;IEnumerable&lt;Event&gt;&gt; GetAllEventsAsync();
+    Task&lt;Event?&gt; GetEventByIdAsync(<span class="hljs-keyword">int</span> eventId);
+    Task&lt;IEnumerable&lt;Event&gt;&gt; GetEventsByCreatorAsync(<span class="hljs-keyword">string</span> userId);
+    <span class="hljs-function">Task&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-title">CreateEventAsync</span>(<span class="hljs-params">Event eventEntity</span>)</span>;
+    <span class="hljs-function">Task&lt;<span class="hljs-keyword">bool</span>&gt; <span class="hljs-title">UpdateEventAsync</span>(<span class="hljs-params">Event eventEntity</span>)</span>;
+    <span class="hljs-function">Task&lt;<span class="hljs-keyword">bool</span>&gt; <span class="hljs-title">DeleteEventAsync</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> eventId</span>)</span>;
+    <span class="hljs-function">Task&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-title">GetRegistrationCountAsync</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> eventId</span>)</span>;
+}
+</div></code></pre>
+<p>Create the <code>EventRepository.cs</code> implementation:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> Dapper;
+<span class="hljs-keyword">using</span> EventManagement.Api.Models;
+<span class="hljs-keyword">using</span> System.Data;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Repositories</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">EventRepository</span> : <span class="hljs-title">IEventRepository</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IDbConnection _connection;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">EventRepository</span>(<span class="hljs-params">IDbConnection connection</span>)</span>
+    {
+        _connection = connection;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;IEnumerable&lt;Event&gt;&gt; GetAllEventsAsync()
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">"SELECT * FROM Events ORDER BY EventDate"</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _connection.QueryAsync&lt;Event&gt;(query);
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;Event?&gt; GetEventByIdAsync(<span class="hljs-keyword">int</span> eventId)
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">"SELECT * FROM Events WHERE EventId = @EventId"</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _connection.QueryFirstOrDefaultAsync&lt;Event&gt;(query, <span class="hljs-keyword">new</span> { EventId = eventId });
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;IEnumerable&lt;Event&gt;&gt; GetEventsByCreatorAsync(<span class="hljs-keyword">string</span> userId)
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">"SELECT * FROM Events WHERE CreatedBy = @UserId ORDER BY EventDate"</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _connection.QueryAsync&lt;Event&gt;(query, <span class="hljs-keyword">new</span> { UserId = userId });
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-title">CreateEventAsync</span>(<span class="hljs-params">Event eventEntity</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">@"
+            INSERT INTO Events (Name, Description, EventDate, Location, MaxAttendees, CreatedBy, CreatedDate)
+            VALUES (@Name, @Description, @EventDate, @Location, @MaxAttendees, @CreatedBy, @CreatedDate);
+            SELECT last_insert_rowid();"</span>;
+            
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _connection.ExecuteScalarAsync&lt;<span class="hljs-keyword">int</span>&gt;(query, eventEntity);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-keyword">bool</span>&gt; <span class="hljs-title">UpdateEventAsync</span>(<span class="hljs-params">Event eventEntity</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">@"
+            UPDATE Events 
+            SET Name = @Name, 
+                Description = @Description, 
+                EventDate = @EventDate, 
+                Location = @Location, 
+                MaxAttendees = @MaxAttendees
+            WHERE EventId = @EventId"</span>;
+            
+        <span class="hljs-keyword">var</span> rowsAffected = <span class="hljs-keyword">await</span> _connection.ExecuteAsync(query, eventEntity);
+        <span class="hljs-keyword">return</span> rowsAffected &gt; <span class="hljs-number">0</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-keyword">bool</span>&gt; <span class="hljs-title">DeleteEventAsync</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> eventId</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">"DELETE FROM Events WHERE EventId = @EventId"</span>;
+        <span class="hljs-keyword">var</span> rowsAffected = <span class="hljs-keyword">await</span> _connection.ExecuteAsync(query, <span class="hljs-keyword">new</span> { EventId = eventId });
+        <span class="hljs-keyword">return</span> rowsAffected &gt; <span class="hljs-number">0</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-title">GetRegistrationCountAsync</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> eventId</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> query = <span class="hljs-string">"SELECT COUNT(*) FROM Registrations WHERE EventId = @EventId"</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _connection.ExecuteScalarAsync&lt;<span class="hljs-keyword">int</span>&gt;(query, <span class="hljs-keyword">new</span> { EventId = eventId });
+    }
+}
+</div></code></pre>
+<h2 id="step-12-implement-the-repr-pattern-for-getallevents">Step 12: Implement the REPR Pattern for GetAllEvents</h2>
+<p>Create the <code>GetAllEventsRequest.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Features.Events.GetAllEvents</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">public</span> record <span class="hljs-title">GetAllEventsRequest</span>(<span class="hljs-params"></span>)</span>;
+</div></code></pre>
+<p>Create the <code>GetAllEventsResponse.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Models;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Features.Events.GetAllEvents</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">public</span> record <span class="hljs-title">GetAllEventsResponse</span>(<span class="hljs-params">IEnumerable&lt;Event&gt; Events</span>)</span>;
+</div></code></pre>
+<p>Create the <code>GetAllEventsHandler.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Repositories;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Features.Events.GetAllEvents</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GetAllEventsHandler</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IEventRepository _eventRepository;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;GetAllEventsHandler&gt; _logger;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">GetAllEventsHandler</span>(<span class="hljs-params">IEventRepository eventRepository, ILogger&lt;GetAllEventsHandler&gt; logger</span>)</span>
+    {
+        _eventRepository = eventRepository;
+        _logger = logger;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;GetAllEventsResponse&gt; <span class="hljs-title">HandleAsync</span>(<span class="hljs-params">GetAllEventsRequest request</span>)</span>
+    {
+        _logger.LogInformation(<span class="hljs-string">"Retrieving all events"</span>);
+        
+        <span class="hljs-keyword">try</span>
+        {
+            <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">await</span> _eventRepository.GetAllEventsAsync();
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> GetAllEventsResponse(events);
+        }
+        <span class="hljs-keyword">catch</span> (Exception ex)
+        {
+            _logger.LogError(ex, <span class="hljs-string">"Error retrieving all events"</span>);
+            <span class="hljs-keyword">throw</span>;
+        }
+    }
+}
+</div></code></pre>
+<p>Create the <code>GetAllEventsEndpoint.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> Microsoft.AspNetCore.Mvc;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Features.Events.GetAllEvents</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GetAllEventsEndpoint</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> WebApplication <span class="hljs-title">MapGetAllEventsEndpoint</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> WebApplication app</span>)</span>
+    {
+        app.MapGet(<span class="hljs-string">"/api/events"</span>, <span class="hljs-keyword">async</span> (
+            [<span class="hljs-meta">FromServices</span>] GetAllEventsHandler handler,
+            [<span class="hljs-meta">FromHeader(Name = <span class="hljs-meta-string">"X-Username"</span>)</span>] <span class="hljs-keyword">string</span>? username) =&gt;
+        {
+            <span class="hljs-comment">// You can use the username from header for authentication validation if needed</span>
+            
+            <span class="hljs-keyword">var</span> request = <span class="hljs-keyword">new</span> GetAllEventsRequest();
+            <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> handler.HandleAsync(request);
+            
+            <span class="hljs-keyword">return</span> Results.Ok(response);
+        })
+        .WithName(<span class="hljs-string">"GetAllEvents"</span>)
+        .WithOpenApi()
+        .WithTags(<span class="hljs-string">"Events"</span>);
+        
+        <span class="hljs-keyword">return</span> app;
+    }
+}
+</div></code></pre>
+<h2 id="step-13-create-the-events-module">Step 13: Create the Events Module</h2>
+<p>Create the <code>EventsModule.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Features.Events.GetAllEvents;
+<span class="hljs-keyword">using</span> EventManagement.Api.Repositories;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Features.Events</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">EventsModule</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IServiceCollection <span class="hljs-title">AddEventsModule</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> IServiceCollection services</span>)</span>
+    {
+        <span class="hljs-comment">// Register repositories</span>
+        services.AddScoped&lt;IEventRepository, EventRepository&gt;();
+        
+        <span class="hljs-comment">// Register handlers</span>
+        services.AddScoped&lt;GetAllEventsHandler&gt;();
+        
+        <span class="hljs-keyword">return</span> services;
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> WebApplication <span class="hljs-title">MapEventsEndpoints</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> WebApplication app</span>)</span>
+    {
+        app.MapGetAllEventsEndpoint();
+        
+        <span class="hljs-keyword">return</span> app;
+    }
+}
+</div></code></pre>
+<h2 id="step-14-update-programcs">Step 14: Update Program.cs</h2>
+<p>Update the <code>Program.cs</code> file:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Common.DependencyInjection;
+<span class="hljs-keyword">using</span> EventManagement.Api.Configuration;
+<span class="hljs-keyword">using</span> EventManagement.Api.Features.Events;
+
+<span class="hljs-comment">// Load environment variables from .env file</span>
+DotEnvReader.Load(Path.Combine(Directory.GetCurrentDirectory(), <span class="hljs-string">".env"</span>));
+
+<span class="hljs-keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="hljs-comment">// Add service defaults (telemetry, health checks, etc.)</span>
+builder.AddServiceDefaults();
+
+<span class="hljs-comment">// Add configuration from environment variables after loading from appsettings</span>
+builder.Configuration.AddEnvironmentVariables();
+
+<span class="hljs-comment">// Add services to the container</span>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+<span class="hljs-comment">// Add SQLite connection</span>
+builder.Services.AddSqliteConnection(builder.Configuration);
+
+<span class="hljs-comment">// Add feature modules</span>
+builder.Services.AddEventsModule();
+
+<span class="hljs-keyword">var</span> app = builder.Build();
+
+<span class="hljs-comment">// Configure middleware</span>
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseHttpsRedirection();
+
+<span class="hljs-comment">// Map endpoints</span>
+app.MapEventsEndpoints();
+
+<span class="hljs-comment">// Map service defaults (health checks, etc.)</span>
+app.MapDefaultEndpoints();
+
+app.Run();
+
+<span class="hljs-comment">// Make Program class accessible to tests</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">partial</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span> { }
+</div></code></pre>
+<h2 id="step-15-create-the-env-file">Step 15: Create the .env file</h2>
+<p>Create a <code>.env</code> file in the API project:</p>
+<pre class="hljs"><code><div>DatabasePath=../EventManagement.Legacy/App_Data/EventManagement.db
+</div></code></pre>
+<h2 id="step-16-create-unit-tests">Step 16: Create Unit Tests</h2>
+<p>Create a test class for the <code>GetAllEventsHandler</code>:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Features.Events.GetAllEvents;
+<span class="hljs-keyword">using</span> EventManagement.Api.Models;
+<span class="hljs-keyword">using</span> EventManagement.Api.Repositories;
+<span class="hljs-keyword">using</span> FluentAssertions;
+<span class="hljs-keyword">using</span> Microsoft.Extensions.Logging;
+<span class="hljs-keyword">using</span> NSubstitute;
+<span class="hljs-keyword">using</span> Xunit;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Tests.Features.Events</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GetAllEventsHandlerTests</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IEventRepository _eventRepository;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;GetAllEventsHandler&gt; _logger;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> GetAllEventsHandler _handler;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">GetAllEventsHandlerTests</span>(<span class="hljs-params"></span>)</span>
+    {
+        _eventRepository = Substitute.For&lt;IEventRepository&gt;();
+        _logger = Substitute.For&lt;ILogger&lt;GetAllEventsHandler&gt;&gt;();
+        _handler = <span class="hljs-keyword">new</span> GetAllEventsHandler(_eventRepository, _logger);
+    }
+
+    [<span class="hljs-meta">Fact</span>]
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">HandleAsync_ShouldReturnAllEvents</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-comment">// Arrange</span>
+        <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">new</span> List&lt;Event&gt;
+        {
+            <span class="hljs-keyword">new</span> Event
+            {
+                EventId = <span class="hljs-number">1</span>,
+                Name = <span class="hljs-string">"Test Event 1"</span>,
+                Description = <span class="hljs-string">"Description 1"</span>,
+                EventDate = DateTime.Now.AddDays(<span class="hljs-number">1</span>),
+                Location = <span class="hljs-string">"Location 1"</span>,
+                MaxAttendees = <span class="hljs-number">10</span>,
+                CreatedBy = <span class="hljs-string">"user1"</span>,
+                CreatedDate = DateTime.Now
+            },
+            <span class="hljs-keyword">new</span> Event
+            {
+                EventId = <span class="hljs-number">2</span>,
+                Name = <span class="hljs-string">"Test Event 2"</span>,
+                Description = <span class="hljs-string">"Description 2"</span>,
+                EventDate = DateTime.Now.AddDays(<span class="hljs-number">2</span>),
+                Location = <span class="hljs-string">"Location 2"</span>,
+                MaxAttendees = <span class="hljs-number">20</span>,
+                CreatedBy = <span class="hljs-string">"user2"</span>,
+                CreatedDate = DateTime.Now
+            }
+        };
+
+        _eventRepository.GetAllEventsAsync().Returns(events);
+
+        <span class="hljs-comment">// Act</span>
+        <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> _handler.HandleAsync(<span class="hljs-keyword">new</span> GetAllEventsRequest());
+
+        <span class="hljs-comment">// Assert</span>
+        response.Events.Should().BeEquivalentTo(events);
+        <span class="hljs-keyword">await</span> _eventRepository.Received(<span class="hljs-number">1</span>).GetAllEventsAsync();
+    }
+
+    [<span class="hljs-meta">Fact</span>]
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">HandleAsync_WhenRepositoryThrowsException_ShouldRethrowException</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-comment">// Arrange</span>
+        _eventRepository.GetAllEventsAsync().Returns(_ =&gt; <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Exception(<span class="hljs-string">"Database error"</span>));
+
+        <span class="hljs-comment">// Act &amp; Assert</span>
+        <span class="hljs-keyword">await</span> Assert.ThrowsAsync&lt;Exception&gt;(() =&gt; _handler.HandleAsync(<span class="hljs-keyword">new</span> GetAllEventsRequest()));
+    }
+}
+</div></code></pre>
+<p>Create an integration test class:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">using</span> EventManagement.Api.Features.Events.GetAllEvents;
+<span class="hljs-keyword">using</span> EventManagement.Api.Models;
+<span class="hljs-keyword">using</span> EventManagement.Api.Repositories;
+<span class="hljs-keyword">using</span> Microsoft.AspNetCore.Mvc.Testing;
+<span class="hljs-keyword">using</span> Microsoft.Extensions.DependencyInjection;
+<span class="hljs-keyword">using</span> NSubstitute;
+<span class="hljs-keyword">using</span> System.Net;
+<span class="hljs-keyword">using</span> System.Text.Json;
+<span class="hljs-keyword">using</span> Xunit;
+
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">EventManagement.Api.Tests.Integration</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">EventsApiTests</span> : <span class="hljs-title">IClassFixture</span>&lt;<span class="hljs-title">WebApplicationFactory</span>&lt;<span class="hljs-title">Program</span>&gt;&gt;
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> WebApplicationFactory&lt;Program&gt; _factory;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">EventsApiTests</span>(<span class="hljs-params">WebApplicationFactory&lt;Program&gt; factory</span>)</span>
+    {
+        _factory = factory.WithWebHostBuilder(builder =&gt;
+        {
+            builder.ConfigureServices(services =&gt;
+            {
+                <span class="hljs-comment">// Mock the event repository for integration tests</span>
+                <span class="hljs-keyword">var</span> eventRepository = Substitute.For&lt;IEventRepository&gt;();
+                <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">new</span> List&lt;Event&gt;
+                {
+                    <span class="hljs-keyword">new</span> Event
+                    {
+                        EventId = <span class="hljs-number">1</span>,
+                        Name = <span class="hljs-string">"Test Event 1"</span>,
+                        EventDate = DateTime.Now.AddDays(<span class="hljs-number">1</span>),
+                        CreatedBy = <span class="hljs-string">"user1"</span>,
+                        CreatedDate = DateTime.Now
+                    }
+                };
+                
+                eventRepository.GetAllEventsAsync().Returns(events);
+                
+                <span class="hljs-comment">// Replace the real repository with the mock</span>
+                services.AddScoped&lt;IEventRepository&gt;(_ =&gt; eventRepository);
+            });
+        });
+    }
+
+    [<span class="hljs-meta">Fact</span>]
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">GetAllEvents_ReturnsSuccessAndEvents</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-comment">// Arrange</span>
+        <span class="hljs-keyword">var</span> client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add(<span class="hljs-string">"X-Username"</span>, <span class="hljs-string">"testuser"</span>);
+
+        <span class="hljs-comment">// Act</span>
+        <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> client.GetAsync(<span class="hljs-string">"/api/events"</span>);
+
+        <span class="hljs-comment">// Assert</span>
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        <span class="hljs-keyword">var</span> content = <span class="hljs-keyword">await</span> response.Content.ReadAsStringAsync();
+        <span class="hljs-keyword">var</span> result = JsonSerializer.Deserialize&lt;GetAllEventsResponse&gt;(content, 
+            <span class="hljs-keyword">new</span> JsonSerializerOptions { PropertyNameCaseInsensitive = <span class="hljs-literal">true</span> });
+        
+        Assert.NotNull(result);
+        Assert.Single(result.Events);
+        Assert.Equal(<span class="hljs-string">"Test Event 1"</span>, result.Events.First().Name);
+    }
+}
+</div></code></pre>
+<h2 id="step-17-modify-the-legacy-mvc-controller">Step 17: Modify the Legacy MVC Controller</h2>
+<p>After setting up the new API, you'll need to modify the legacy EventController to call the API:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">EventController</span> : <span class="hljs-title">Controller</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> HttpClient _httpClient;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-keyword">string</span> _apiBaseUrl;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">EventController</span>(<span class="hljs-params"></span>)</span>
+    {
+        _httpClient = <span class="hljs-keyword">new</span> HttpClient();
+        _apiBaseUrl = ConfigurationManager.AppSettings[<span class="hljs-string">"ApiBaseUrl"</span>] ?? <span class="hljs-string">"https://localhost:5001"</span>;
+    }
+
+    [<span class="hljs-meta">HttpGet</span>]
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;ActionResult&gt; <span class="hljs-title">Index</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-keyword">try</span>
+        {
+            <span class="hljs-comment">// Get current user info</span>
+            <span class="hljs-keyword">var</span> username = User.Identity.GetUserName();
+            
+            <span class="hljs-comment">// Set headers for the API call</span>
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add(<span class="hljs-string">"X-Username"</span>, username);
+            
+            <span class="hljs-comment">// Add roles if needed</span>
+            <span class="hljs-keyword">if</span> (User.IsInRole(Roles.Admin))
+            {
+                _httpClient.DefaultRequestHeaders.Add(<span class="hljs-string">"X-Role"</span>, Roles.Admin);
+            }
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (User.IsInRole(Roles.Organizer))
+            {
+                _httpClient.DefaultRequestHeaders.Add(<span class="hljs-string">"X-Role"</span>, Roles.Organizer);
+            }
+            <span class="hljs-keyword">else</span>
+            {
+                _httpClient.DefaultRequestHeaders.Add(<span class="hljs-string">"X-Role"</span>, Roles.User);
+            }
+
+            <span class="hljs-comment">// Call the API</span>
+            <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> _httpClient.GetAsync(<span class="hljs-string">$"<span class="hljs-subst">{_apiBaseUrl}</span>/api/events"</span>);
+            
+            <span class="hljs-keyword">if</span> (response.IsSuccessStatusCode)
+            {
+                <span class="hljs-keyword">var</span> content = <span class="hljs-keyword">await</span> response.Content.ReadAsStringAsync();
+                <span class="hljs-keyword">var</span> result = JsonConvert.DeserializeObject&lt;<span class="hljs-keyword">dynamic</span>&gt;(content);
+                <span class="hljs-keyword">var</span> events = JsonConvert.DeserializeObject&lt;List&lt;Event&gt;&gt;(result.events.ToString());
+                
+                <span class="hljs-keyword">return</span> View(events);
+            }
+            
+            <span class="hljs-keyword">return</span> View(<span class="hljs-string">"Error"</span>);
+        }
+        <span class="hljs-keyword">catch</span> (Exception ex)
+        {
+            <span class="hljs-comment">// Log the exception</span>
+            <span class="hljs-keyword">return</span> View(<span class="hljs-string">"Error"</span>);
+        }
+    }
+    
+    <span class="hljs-comment">// Other actions...</span>
+}
+</div></code></pre>
+<h2 id="step-18-run-and-test-the-projects-with-aspire">Step 18: Run and Test the Projects with Aspire</h2>
+<ol>
+<li>Add a <code>.env</code> file to the AppHost project:</li>
+</ol>
+<pre class="hljs"><code><div>DatabasePath=../EventManagement.Legacy/App_Data/EventManagement.db
+</div></code></pre>
+<ol start="2">
+<li>Navigate to the AppHost directory and run the Aspire orchestration:</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-built_in">cd</span> ../EventManagement.Aspire.AppHost
+dotnet run
+</div></code></pre>
+<p>This will start the Aspire dashboard and run your API project.</p>
+<h2 id="key-points-to-remember">Key Points to Remember</h2>
+<ol>
+<li>
+<p><strong>Database Configuration:</strong></p>
+<ul>
+<li>Both applications share the same SQLite database</li>
+<li>The database path is configured via the <code>.env</code> file</li>
+</ul>
+</li>
+<li>
+<p><strong>Authentication/Authorization:</strong></p>
+<ul>
+<li>The legacy app passes user information via HTTP headers</li>
+<li>The API can validate user permissions based on these headers</li>
+</ul>
+</li>
+<li>
+<p><strong>REPR Pattern:</strong></p>
+<ul>
+<li>Request objects define the input</li>
+<li>Endpoints map the HTTP routes</li>
+<li>Handler classes contain the business logic</li>
+<li>Response objects define the output</li>
+</ul>
+</li>
+<li>
+<p><strong>Testing:</strong></p>
+<ul>
+<li>Unit tests focus on handler logic using NSubstitute for mocking</li>
+<li>Integration tests use WebApplicationFactory to test API endpoints</li>
+</ul>
+</li>
+<li>
+<p><strong>Dependency Injection:</strong></p>
+<ul>
+<li>SQLite connections are registered as scoped services</li>
+<li>Repositories and handlers are registered appropriately</li>
+</ul>
+</li>
+<li>
+<p><strong>Aspire Configuration:</strong></p>
+<ul>
+<li>Orchestrates the API project (and eventually the legacy app)</li>
+<li>Manages environment variables and configuration</li>
+</ul>
+</li>
+</ol>
+<p>By following these steps, you've successfully migrated your first endpoint to a .NET 9.0 Minimal API while maintaining compatibility with your legacy application. You can continue this process for other endpoints, gradually moving the business logic from the MVC controllers to the new API.</p>
+
+</body>
+</html>

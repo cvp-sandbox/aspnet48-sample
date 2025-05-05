@@ -6,6 +6,23 @@ import Layout from './components/Layout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+// Import pages
+import Home from './pages/Home';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import EventList from './pages/events/EventList';
+import EventDetails from './pages/events/EventDetails';
+import CreateEvent from './pages/events/CreateEvent';
+import EditEvent from './pages/events/EditEvent';
+import MyEvents from './pages/events/MyEvents';
+import MyRegistrations from './pages/events/MyRegistrations';
+
+// Placeholder components for routes (to be implemented later)
+const AccessDenied = () => <div className="container mt-4"><h1>Access Denied</h1></div>;
+const NotFound = () => <div className="container mt-4"><h1>404 - Not Found</h1></div>;
+
 // Create a client for React Query
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,17 +33,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Placeholder components for routes (to be implemented later)
-const Home = () => <div className="container mt-4"><h1>Home Page</h1></div>;
-const Login = () => <div className="container mt-4"><h1>Login Page</h1></div>;
-const Register = () => <div className="container mt-4"><h1>Register Page</h1></div>;
-const EventList = () => <div className="container mt-4"><h1>Event List</h1></div>;
-const EventDetails = () => <div className="container mt-4"><h1>Event Details</h1></div>;
-const MyEvents = () => <div className="container mt-4"><h1>My Events</h1></div>;
-const MyRegistrations = () => <div className="container mt-4"><h1>My Registrations</h1></div>;
-const AccessDenied = () => <div className="container mt-4"><h1>Access Denied</h1></div>;
-const NotFound = () => <div className="container mt-4"><h1>404 - Not Found</h1></div>;
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -35,6 +41,8 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Layout><Home /></Layout>} />
+            <Route path="/about" element={<Layout><About /></Layout>} />
+            <Route path="/contact" element={<Layout><Contact /></Layout>} />
             <Route path="/login" element={<Layout><Login /></Layout>} />
             <Route path="/register" element={<Layout><Register /></Layout>} />
             <Route path="/events" element={<Layout><EventList /></Layout>} />
@@ -45,6 +53,12 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/my-events" element={<Layout><MyEvents /></Layout>} />
               <Route path="/my-registrations" element={<Layout><MyRegistrations /></Layout>} />
+            </Route>
+            
+            {/* Organizer routes - require organizer or admin role */}
+            <Route element={<ProtectedRoute requiredRole="Organizer" />}>
+              <Route path="/events/create" element={<Layout><CreateEvent /></Layout>} />
+              <Route path="/events/edit/:id" element={<Layout><EditEvent /></Layout>} />
             </Route>
             
             {/* Admin routes - require admin role */}

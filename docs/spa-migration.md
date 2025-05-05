@@ -42,7 +42,7 @@ The React SPA will communicate with the existing .NET 9.0 API using the OpenAPI 
 
 - Generate TypeScript interfaces from the OpenAPI spec
 - Create API client with Axios
-- Implement authentication header mechanism (X-Username, X-Role)
+- Implement JWT authentication with Authorization header
 - Use React Query for data fetching, caching, and state management
 
 ### 3. Feature Migration Approach
@@ -66,13 +66,16 @@ The React SPA will be organized into the following component structure:
 
 ### 5. Authentication & Authorization
 
-Authentication will be handled via custom headers:
-- `X-Username`: The username of the authenticated user
-- `X-Role`: The roles of the authenticated user
+Authentication will be handled via JWT (JSON Web Tokens):
+- Tokens will be issued by the API upon successful login
+- Tokens will contain user ID, email, and roles as claims
+- Tokens will be included in the Authorization header for API requests
 
 We'll implement:
 - Login/Register forms
-- AuthContext for global auth state
+- AuthContext for global auth state and token management
+- Token storage in localStorage/sessionStorage with proper security measures
+- Automatic token refresh mechanism
 - Protected routes based on user roles
 - Conditional rendering based on user roles
 

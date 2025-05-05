@@ -1,8 +1,12 @@
 using EventManagement.Api.Common.DependencyInjection;
+using EventManagement.Api.Common.Identity;
 using EventManagement.Api.Configuration;
 using EventManagement.Api.Features.Events;
 using EventManagement.Api.Features.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 
 // Load environment variables from .env file
 DotEnvReader.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
@@ -11,6 +15,44 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults (telemetry, health checks, etc.)
 builder.AddServiceDefaults();
+
+// Configure CORS to allow requests from the SPA
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpaOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:44372")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Configure JWT Authentication
+var jwtSettings = new JwtSettings();
+builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddSingleton<JwtTokenService>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = jwtSettings.GetSymmetricSecurityKey()
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // Add configuration from environment variables after loading from appsettings
 builder.Configuration
@@ -52,7 +94,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseHeaderAuthentication(); 
+// Enable CORS with the policy
+app.UseCors("AllowSpaOrigin");
+
+
+// Enable Authentication & Authorization
+// This will process JWT tokens from the Authorization header
+app.UseAuthentication();
+app.UseAuthorization();
+
+// For backward compatibility, also use header authentication
+// This will only authenticate if JWT authentication didn't already succeed
+// It checks for X-User/X-Username and X-Role headers
+app.UseHeaderAuthentication();
+
+
 
 // Map endpoints
 app.MapEventsEndpoints();

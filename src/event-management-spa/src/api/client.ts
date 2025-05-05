@@ -11,11 +11,18 @@ const apiClient = axios.create({
 // Request interceptor to add auth headers
 apiClient.interceptors.request.use(
   (config) => {
-    // Get auth data from localStorage
+    // Get auth token from localStorage
+    const token = localStorage.getItem('auth_token');
+    
+    // Add Authorization header if token is available
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    // For backward compatibility, also add the username and role headers
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
 
-    // Add auth headers if available
     if (username) {
       config.headers['X-Username'] = username;
     }
@@ -46,6 +53,7 @@ apiClient.interceptors.response.use(
         // Unauthorized - clear auth data and redirect to login
         localStorage.removeItem('username');
         localStorage.removeItem('role');
+        localStorage.removeItem('auth_token');
         window.location.href = '/login';
       }
       

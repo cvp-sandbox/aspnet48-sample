@@ -15,41 +15,46 @@ public class HeaderAuthenticationMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Check if we have the username header
-        if (context.Request.Headers.TryGetValue("X-Username", out var usernameValues) &&
-            !string.IsNullOrEmpty(usernameValues))
+        // Only apply header authentication if the user is not already authenticated
+        // This allows JWT authentication to take precedence if a valid token is present
+        if (!context.User.Identity?.IsAuthenticated ?? true)
         {
-            var username = usernameValues.ToString();
-
-            // Create claims for the user
-            var claims = new List<Claim>
+            // Check if we have the username header (support both X-User and X-Username for backward compatibility)
+            if ((context.Request.Headers.TryGetValue("X-User", out var userValues) && 
+                !string.IsNullOrEmpty(userValues)) ||
+                (context.Request.Headers.TryGetValue("X-Username", out userValues) && 
+                !string.IsNullOrEmpty(userValues)))
             {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.NameIdentifier, username)
-            };
+                var username = userValues.ToString();
 
-            // Add role claims if present
-            if (context.Request.Headers.TryGetValue("X-Role", out var roleValues))
-            {
-                foreach (var roleValue in roleValues)
+                // Create claims for the user
+                var claims = new List<Claim>
                 {
-                    // Split in case we received comma-separated values
-                    var splitRoles = roleValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var role in splitRoles)
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.NameIdentifier, username)
+                };
+
+                // Add role claims if present
+                if (context.Request.Headers.TryGetValue("X-Role", out var roleValues))
+                {
+                    foreach (var roleValue in roleValues)
                     {
-                        claims.Add(new Claim(ClaimTypes.Role, role.Trim()));
+                        // Split in case we received comma-separated values
+                        var splitRoles = roleValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var role in splitRoles)
+                        {
+                            claims.Add(new Claim(ClaimTypes.Role, role.Trim()));
+                        }
                     }
                 }
+
+                // Create the identity and principal
+                var identity = new ClaimsIdentity(claims, "Header");
+                var principal = new ClaimsPrincipal(identity);
+
+                // Set the user on the HttpContext
+                context.User = principal;
             }
-
-
-
-            // Create the identity and principal
-            var identity = new ClaimsIdentity(claims, "Header");
-            var principal = new ClaimsPrincipal(identity);
-
-            // Set the user on the HttpContext
-            context.User = principal;
         }
 
         // Continue processing the request

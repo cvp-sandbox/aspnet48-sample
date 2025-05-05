@@ -12,6 +12,9 @@ namespace EventManagement.Api.Features.Users.Login
             {
                 var response = await handler.HandleAsync(request);
                 
+                // Log the response for debugging
+                Console.WriteLine($"Login response: Success={response.Success}, Email={response.Email}, Roles={string.Join(",", response.Roles)}, Token={response.Token?.Substring(0, 20)}...");
+                
                 if (!response.Success)
                 {
                     return Results.BadRequest(response);

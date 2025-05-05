@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>spa-migration-tasks.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="event-registration-system---spa-migration-tasks">Event Registration System - SPA Migration Tasks</h1>
+<p>This document tracks the tasks required to migrate the ASP.NET MVC Event Registration System to a React SPA.</p>
+<h2 id="phase-1-setup--core-infrastructure">Phase 1: Setup &amp; Core Infrastructure</h2>
+<h3 id="project-setup">Project Setup</h3>
+<ul>
+<li><input type="checkbox" id="checkbox0" checked="true"><label for="checkbox0">Initialize React+Vite project (already done)</label></li>
+<li><input type="checkbox" id="checkbox1" checked="true"><label for="checkbox1">Configure TypeScript settings</label></li>
+<li><input type="checkbox" id="checkbox2" checked="true"><label for="checkbox2">Set up ESLint and Prettier</label></li>
+<li><input type="checkbox" id="checkbox3" checked="true"><label for="checkbox3">Configure directory structure</label></li>
+<li><input type="checkbox" id="checkbox4" checked="true"><label for="checkbox4">Add .env file support for environment variables</label></li>
+</ul>
+<h3 id="dependencies-installation">Dependencies Installation</h3>
+<ul>
+<li><input type="checkbox" id="checkbox5" checked="true"><label for="checkbox5">Install routing dependencies (react-router-dom)</label></li>
+<li><input type="checkbox" id="checkbox6" checked="true"><label for="checkbox6">Install HTTP client (axios)</label></li>
+<li><input type="checkbox" id="checkbox7" checked="true"><label for="checkbox7">Install form handling libraries (react-hook-form, zod)</label></li>
+<li><input type="checkbox" id="checkbox8" checked="true"><label for="checkbox8">Install data fetching library (@tanstack/react-query)</label></li>
+<li><input type="checkbox" id="checkbox9" checked="true"><label for="checkbox9">Install UI libraries (bootstrap, react-bootstrap, react-icons)</label></li>
+<li><input type="checkbox" id="checkbox10" checked="true"><label for="checkbox10">Install OpenAPI code generation tools (openapi-typescript-codegen)</label></li>
+<li><input type="checkbox" id="checkbox11" checked="true"><label for="checkbox11">Install testing libraries (vitest, @testing-library/react, msw)</label></li>
+</ul>
+<h3 id="api-integration">API Integration</h3>
+<ul>
+<li><input type="checkbox" id="checkbox12" checked="true"><label for="checkbox12">Generate TypeScript interfaces from OpenAPI spec</label></li>
+<li><input type="checkbox" id="checkbox13" checked="true"><label for="checkbox13">Configure API base URL (https://localhost:7264/)</label></li>
+<li><input type="checkbox" id="checkbox14" checked="true"><label for="checkbox14">Create API client with Axios</label></li>
+<li><input type="checkbox" id="checkbox15" checked="true"><label for="checkbox15">Set up request/response interceptors for JWT authentication (Authorization header)</label></li>
+<li><input type="checkbox" id="checkbox16" checked="true"><label for="checkbox16">Implement error handling middleware</label></li>
+</ul>
+<h3 id="authentication-infrastructure">Authentication Infrastructure</h3>
+<ul>
+<li><input type="checkbox" id="checkbox17" checked="true"><label for="checkbox17">Create AuthContext for global auth state</label></li>
+<li><input type="checkbox" id="checkbox18" checked="true"><label for="checkbox18">Implement JWT token management</label></li>
+<li><input type="checkbox" id="checkbox19" checked="true"><label for="checkbox19">Create login/logout functionality</label></li>
+<li><input type="checkbox" id="checkbox20" checked="true"><label for="checkbox20">Create protected route component</label></li>
+</ul>
+<h3 id="routing-setup">Routing Setup</h3>
+<ul>
+<li><input type="checkbox" id="checkbox21" checked="true"><label for="checkbox21">Set up React Router</label></li>
+<li><input type="checkbox" id="checkbox22" checked="true"><label for="checkbox22">Define route configuration for API-supported views</label></li>
+<li><input type="checkbox" id="checkbox23" checked="true"><label for="checkbox23">Implement role-based route protection</label></li>
+</ul>
+<h2 id="phase-2-core-features-implementation-prioritizing-get-operations">Phase 2: Core Features Implementation (Prioritizing GET Operations)</h2>
+<h3 id="layout-components">Layout Components</h3>
+<ul>
+<li><input type="checkbox" id="checkbox24" checked="true"><label for="checkbox24">Create Layout component</label></li>
+<li><input type="checkbox" id="checkbox25" checked="true"><label for="checkbox25">Implement Header component with navigation</label></li>
+<li><input type="checkbox" id="checkbox26" checked="true"><label for="checkbox26">Create Footer component</label></li>
+<li><input type="checkbox" id="checkbox27" checked="true"><label for="checkbox27">Implement LoginStatus component</label></li>
+</ul>
+<h3 id="get-operations-priority">GET Operations (Priority)</h3>
+<ul>
+<li><input type="checkbox" id="checkbox28" checked="true"><label for="checkbox28">Implement EventList component using </label><code>GET /api/events</code></li>
+<li><input type="checkbox" id="checkbox29" checked="true"><label for="checkbox29">Create EventCard component for list items</label></li>
+<li><input type="checkbox" id="checkbox30" checked="true"><label for="checkbox30">Create EventDetails component using </label><code>GET /api/events/{id}</code></li>
+<li><input type="checkbox" id="checkbox31" checked="true"><label for="checkbox31">Implement MyEvents component using </label><code>GET /api/events/my-events</code></li>
+<li><input type="checkbox" id="checkbox32" checked="true"><label for="checkbox32">Create MyRegistrations component using </label><code>GET /api/events/my-registrations</code></li>
+<li><input type="checkbox" id="checkbox33" checked="true"><label for="checkbox33">Implement FeaturedEvents component using </label><code>GET /api/events/featured</code></li>
+<li><input type="checkbox" id="checkbox34" checked="true"><label for="checkbox34">Create EventStats component using </label><code>GET /api/events/stats</code></li>
+<li><input type="checkbox" id="checkbox35" checked="true"><label for="checkbox35">Implement UpcomingEvents component using </label><code>GET /api/events/upcoming</code></li>
+</ul>
+<h3 id="postputdelete-operations-secondary">POST/PUT/DELETE Operations (Secondary)</h3>
+<ul>
+<li><input type="checkbox" id="checkbox36"><label for="checkbox36">Create EventForm component with validation</label></li>
+<li><input type="checkbox" id="checkbox37"><label for="checkbox37">Implement event creation using </label><code>POST /api/events</code></li>
+<li><input type="checkbox" id="checkbox38"><label for="checkbox38">Implement event editing using </label><code>PUT /api/events/{id}</code></li>
+<li><input type="checkbox" id="checkbox39"><label for="checkbox39">Create event deletion using </label><code>DELETE /api/events/{id}</code></li>
+<li><input type="checkbox" id="checkbox40"><label for="checkbox40">Implement registration functionality using </label><code>POST /api/events/{id}/register</code></li>
+<li><input type="checkbox" id="checkbox41"><label for="checkbox41">Create registration cancellation using </label><code>POST /api/events/{id}/cancel-registration</code></li>
+</ul>
+<h2 id="phase-3-authentication-features">Phase 3: Authentication Features</h2>
+<h3 id="user-authentication">User Authentication</h3>
+<ul>
+<li><input type="checkbox" id="checkbox42" checked="true"><label for="checkbox42">Implement login form using </label><code>POST /api/users/login</code></li>
+<li><input type="checkbox" id="checkbox43" checked="true"><label for="checkbox43">Create registration form using </label><code>POST /api/users/register</code></li>
+<li><input type="checkbox" id="checkbox44" checked="true"><label for="checkbox44">Implement logout functionality using </label><code>POST /api/users/logoff</code></li>
+<li><input type="checkbox" id="checkbox45" checked="true"><label for="checkbox45">Add role-based conditional rendering</label></li>
+</ul>
+<h2 id="phase-4-testing--refinement">Phase 4: Testing &amp; Refinement</h2>
+<h3 id="component-testing">Component Testing</h3>
+<ul>
+<li><input type="checkbox" id="checkbox46"><label for="checkbox46">Set up testing environment</label></li>
+<li><input type="checkbox" id="checkbox47"><label for="checkbox47">Create tests for API-integrated components</label></li>
+<li><input type="checkbox" id="checkbox48"><label for="checkbox48">Test protected routes</label></li>
+</ul>
+<h3 id="uiux-refinement">UI/UX Refinement</h3>
+<ul>
+<li><input type="checkbox" id="checkbox49"><label for="checkbox49">Ensure responsive design</label></li>
+<li><input type="checkbox" id="checkbox50"><label for="checkbox50">Implement loading states</label></li>
+<li><input type="checkbox" id="checkbox51"><label for="checkbox51">Add error handling UI</label></li>
+<li><input type="checkbox" id="checkbox52"><label for="checkbox52">Improve form validation feedback</label></li>
+</ul>
+<h3 id="performance-optimization">Performance Optimization</h3>
+<ul>
+<li><input type="checkbox" id="checkbox53"><label for="checkbox53">Implement code splitting</label></li>
+<li><input type="checkbox" id="checkbox54"><label for="checkbox54">Add caching strategies</label></li>
+<li><input type="checkbox" id="checkbox55"><label for="checkbox55">Implement lazy loading for routes</label></li>
+</ul>
+<h2 id="phase-5-deployment--documentation">Phase 5: Deployment &amp; Documentation</h2>
+<h3 id="build-configuration">Build Configuration</h3>
+<ul>
+<li><input type="checkbox" id="checkbox56"><label for="checkbox56">Configure production build settings</label></li>
+<li><input type="checkbox" id="checkbox57"><label for="checkbox57">Set up environment-specific variables</label></li>
+</ul>
+<h3 id="documentation">Documentation</h3>
+<ul>
+<li><input type="checkbox" id="checkbox58"><label for="checkbox58">Create README with setup instructions</label></li>
+<li><input type="checkbox" id="checkbox59"><label for="checkbox59">Document component usage</label></li>
+<li><input type="checkbox" id="checkbox60"><label for="checkbox60">Add API integration documentation</label></li>
+</ul>
+<h2 id="implementation-details">Implementation Details</h2>
+<h3 id="openapi-code-generation">OpenAPI Code Generation</h3>
+<p>We'll use <code>openapi-typescript-codegen</code> to generate TypeScript interfaces and API client from the OpenAPI spec:</p>
+<pre class="hljs"><code><div>npm install openapi-typescript-codegen --save-dev
+</div></code></pre>
+<p>Generate API client:</p>
+<pre class="hljs"><code><div>npx openapi-typescript-codegen --input src/EventManagement.Api/openAPI-v1.json --output src/event-management-spa/src/api --client axios
+</div></code></pre>
+<h3 id="api-client-structure">API Client Structure</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">// src/api/client.ts</span>
+<span class="hljs-keyword">import</span> axios <span class="hljs-keyword">from</span> <span class="hljs-string">'axios'</span>;
+<span class="hljs-keyword">import</span> { AuthContext } <span class="hljs-keyword">from</span> <span class="hljs-string">'../contexts/AuthContext'</span>;
+
+<span class="hljs-keyword">const</span> apiClient = axios.create({
+  baseURL: <span class="hljs-string">'https://localhost:7264'</span>,
+  headers: {
+    <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span>,
+  },
+});
+
+<span class="hljs-comment">// Request interceptor to add JWT auth header</span>
+apiClient.interceptors.request.use(
+  <span class="hljs-function">(<span class="hljs-params">config</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> auth = useContext(AuthContext);
+    <span class="hljs-keyword">if</span> (auth.isAuthenticated &amp;&amp; auth.token) {
+      config.headers[<span class="hljs-string">'Authorization'</span>] = <span class="hljs-string">`Bearer <span class="hljs-subst">${auth.token}</span>`</span>;
+    }
+    <span class="hljs-keyword">return</span> config;
+  },
+  <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.reject(error);
+  }
+);
+
+<span class="hljs-comment">// Response interceptor to handle token expiration</span>
+apiClient.interceptors.response.use(
+  <span class="hljs-function">(<span class="hljs-params">response</span>) =&gt;</span> response,
+  <span class="hljs-keyword">async</span> (error) =&gt; {
+    <span class="hljs-keyword">const</span> originalRequest = error.config;
+    
+    <span class="hljs-comment">// If error is 401 and we haven't already tried to refresh</span>
+    <span class="hljs-keyword">if</span> (error.response?.status === <span class="hljs-number">401</span> &amp;&amp; !originalRequest._retry) {
+      originalRequest._retry = <span class="hljs-literal">true</span>;
+      
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-comment">// Attempt to refresh the token</span>
+        <span class="hljs-keyword">const</span> auth = useContext(AuthContext);
+        <span class="hljs-keyword">await</span> auth.refreshToken();
+        
+        <span class="hljs-comment">// Retry the original request with new token</span>
+        <span class="hljs-keyword">if</span> (auth.token) {
+          originalRequest.headers[<span class="hljs-string">'Authorization'</span>] = <span class="hljs-string">`Bearer <span class="hljs-subst">${auth.token}</span>`</span>;
+          <span class="hljs-keyword">return</span> axios(originalRequest);
+        }
+      } <span class="hljs-keyword">catch</span> (refreshError) {
+        <span class="hljs-comment">// If refresh fails, logout user</span>
+        <span class="hljs-keyword">const</span> auth = useContext(AuthContext);
+        auth.logout();
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.reject(refreshError);
+      }
+    }
+    
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.reject(error);
+  }
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> apiClient;
+</div></code></pre>
+<h3 id="react-query-integration">React Query Integration</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">// src/hooks/useEvents.ts</span>
+<span class="hljs-keyword">import</span> { useQuery } <span class="hljs-keyword">from</span> <span class="hljs-string">'@tanstack/react-query'</span>;
+<span class="hljs-keyword">import</span> { EventsService } <span class="hljs-keyword">from</span> <span class="hljs-string">'../api'</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> useEvents = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> useQuery({
+    queryKey: [<span class="hljs-string">'events'</span>],
+    queryFn: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> EventsService.getAllEvents(),
+  });
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> useEventById = <span class="hljs-function">(<span class="hljs-params">id: <span class="hljs-built_in">number</span></span>) =&gt;</span> {
+  <span class="hljs-keyword">return</span> useQuery({
+    queryKey: [<span class="hljs-string">'events'</span>, id],
+    queryFn: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> EventsService.getEventById(id),
+    enabled: !!id,
+  });
+};
+
+<span class="hljs-comment">// Additional hooks for other GET operations</span>
+</div></code></pre>
+<h3 id="component-example-eventlist">Component Example (EventList)</h3>
+<pre class="hljs"><code><div>// src/components/events/EventList.tsx
+import { useEvents } from '../hooks/useEvents';
+import EventCard from './EventCard';
+
+const EventList = () =&gt; {
+  const { data, isLoading, error } = useEvents();
+
+  if (isLoading) return &lt;div&gt;Loading events...&lt;/div&gt;;
+  if (error) return &lt;div&gt;Error loading events: {error.message}&lt;/div&gt;;
+
+  return (
+    &lt;div className=&quot;row&quot;&gt;
+      {data?.events.map((event) =&gt; (
+        &lt;div className=&quot;col-md-4&quot; key={event.eventId}&gt;
+          &lt;EventCard event={event} /&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+};
+
+export default EventList;
+</div></code></pre>
+<h2 id="progress-tracking">Progress Tracking</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Progress</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project Setup</td>
+<td>100%</td>
+<td>Completed</td>
+</tr>
+<tr>
+<td>API Integration</td>
+<td>100%</td>
+<td>Completed</td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>100%</td>
+<td>Completed</td>
+</tr>
+<tr>
+<td>Layout Components</td>
+<td>100%</td>
+<td>Completed</td>
+</tr>
+<tr>
+<td>GET Operations</td>
+<td>100%</td>
+<td>Completed</td>
+</tr>
+<tr>
+<td>POST/PUT/DELETE Operations</td>
+<td>0%</td>
+<td>Not Started</td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>0%</td>
+<td>Not Started</td>
+</tr>
+<tr>
+<td>Overall</td>
+<td>75%</td>
+<td>Phase 1, 2 &amp; 3 Completed, Phase 4 Next</td>
+</tr>
+</tbody>
+</table>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The React SPA will use the existing .NET 9.0 API as a backend for frontend (BFF)</li>
+<li>API base URL: https://localhost:7264/</li>
+<li>Authentication will be handled via JWT tokens in the Authorization header</li>
+<li>GET operations are prioritized for initial implementation</li>
+<li>Authentication features are now fully implemented with login/register forms, logout functionality, and role-based conditional rendering</li>
+<li>User authentication uses JWT tokens with the API endpoints <code>/api/users/login</code>, <code>/api/users/register</code>, and <code>/api/users/logoff</code></li>
+</ul>
+
+</body>
+</html>

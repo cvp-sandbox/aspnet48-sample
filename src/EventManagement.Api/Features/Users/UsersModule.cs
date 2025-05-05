@@ -42,8 +42,8 @@ public static class UsersModule
         app.MapLoginEndpoint();
         app.MapRegisterEndpoint();
         app.MapLogOffEndpoint();
+        app.MapAuthTestEndpoint();
 
         return app;
     }
 }
-

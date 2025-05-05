@@ -10,5 +10,12 @@ namespace EventManagement.Api.Features.Users.Login
         public List<string> Roles { get; set; } = new List<string>();
         public string ErrorMessage { get; set; }
         public string ReturnUrl { get; set; }
+        
+        // JWT token for authentication
+        public string Token { get; set; }
+        
+        // For backward compatibility
+        public string Username => Email;
+        public string Role => Roles.Count > 0 ? Roles[0] : null;
     }
 }

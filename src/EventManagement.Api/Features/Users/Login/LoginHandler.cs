@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EventManagement.Api.Common.Identity;
 using EventManagement.Api.Repositories;
 
 namespace EventManagement.Api.Features.Users.Login;
@@ -7,11 +8,16 @@ public class LoginHandler
     {
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly JwtTokenService _jwtTokenService;
 
-        public LoginHandler(IUserRepository userRepository, IRoleRepository roleRepository)
+        public LoginHandler(
+            IUserRepository userRepository, 
+            IRoleRepository roleRepository,
+            JwtTokenService jwtTokenService)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
+            _jwtTokenService = jwtTokenService ?? throw new ArgumentNullException(nameof(jwtTokenService));
         }
 
         public async Task<LoginResponse> HandleAsync(LoginRequest request)
@@ -48,6 +54,9 @@ public class LoginHandler
             response.UserId = userId;
             response.Email = request.Email;
             response.Roles.AddRange(roles);
+            
+            // Generate JWT token
+            response.Token = _jwtTokenService.GenerateToken(userId, request.Email, roles);
 
             return response;
         }

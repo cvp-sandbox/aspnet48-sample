@@ -24,12 +24,12 @@ This document tracks the tasks required to migrate the ASP.NET MVC Event Registr
 - [x] Generate TypeScript interfaces from OpenAPI spec
 - [x] Configure API base URL (https://localhost:7264/)
 - [x] Create API client with Axios
-- [x] Set up request/response interceptors for authentication headers (X-Username, X-Role)
+- [x] Set up request/response interceptors for JWT authentication (Authorization header)
 - [x] Implement error handling middleware
 
 ### Authentication Infrastructure
 - [x] Create AuthContext for global auth state
-- [x] Implement authentication header mechanism
+- [x] Implement JWT token management
 - [x] Create login/logout functionality
 - [x] Create protected route component
 
@@ -44,17 +44,17 @@ This document tracks the tasks required to migrate the ASP.NET MVC Event Registr
 - [x] Create Layout component
 - [x] Implement Header component with navigation
 - [x] Create Footer component
-- [ ] Implement LoginStatus component
+- [x] Implement LoginStatus component
 
 ### GET Operations (Priority)
-- [ ] Implement EventList component using `GET /api/events`
-- [ ] Create EventCard component for list items
-- [ ] Create EventDetails component using `GET /api/events/{id}`
-- [ ] Implement MyEvents component using `GET /api/events/my-events`
-- [ ] Create MyRegistrations component using `GET /api/events/my-registrations`
-- [ ] Implement FeaturedEvents component using `GET /api/events/featured`
-- [ ] Create EventStats component using `GET /api/events/stats`
-- [ ] Implement UpcomingEvents component using `GET /api/events/upcoming`
+- [x] Implement EventList component using `GET /api/events`
+- [x] Create EventCard component for list items
+- [x] Create EventDetails component using `GET /api/events/{id}`
+- [x] Implement MyEvents component using `GET /api/events/my-events`
+- [x] Create MyRegistrations component using `GET /api/events/my-registrations`
+- [x] Implement FeaturedEvents component using `GET /api/events/featured`
+- [x] Create EventStats component using `GET /api/events/stats`
+- [x] Implement UpcomingEvents component using `GET /api/events/upcoming`
 
 ### POST/PUT/DELETE Operations (Secondary)
 - [ ] Create EventForm component with validation
@@ -67,10 +67,10 @@ This document tracks the tasks required to migrate the ASP.NET MVC Event Registr
 ## Phase 3: Authentication Features
 
 ### User Authentication
-- [ ] Implement login form using `POST /api/users/login`
-- [ ] Create registration form using `POST /api/users/register`
-- [ ] Implement logout functionality using `POST /api/users/logoff`
-- [ ] Add role-based conditional rendering
+- [x] Implement login form using `POST /api/users/login`
+- [x] Create registration form using `POST /api/users/register`
+- [x] Implement logout functionality using `POST /api/users/logoff`
+- [x] Add role-based conditional rendering
 
 ## Phase 4: Testing & Refinement
 
@@ -131,19 +131,48 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add auth headers
+// Request interceptor to add JWT auth header
 apiClient.interceptors.request.use(
   (config) => {
     const auth = useContext(AuthContext);
-    if (auth.isAuthenticated) {
-      config.headers['X-Username'] = auth.username;
-      if (auth.roles && auth.roles.length > 0) {
-        config.headers['X-Role'] = auth.roles;
-      }
+    if (auth.isAuthenticated && auth.token) {
+      config.headers['Authorization'] = `Bearer ${auth.token}`;
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle token expiration
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // If error is 401 and we haven't already tried to refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        // Attempt to refresh the token
+        const auth = useContext(AuthContext);
+        await auth.refreshToken();
+        
+        // Retry the original request with new token
+        if (auth.token) {
+          originalRequest.headers['Authorization'] = `Bearer ${auth.token}`;
+          return axios(originalRequest);
+        }
+      } catch (refreshError) {
+        // If refresh fails, logout user
+        const auth = useContext(AuthContext);
+        auth.logout();
+        return Promise.reject(refreshError);
+      }
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -210,15 +239,17 @@ export default EventList;
 | Project Setup | 100% | Completed |
 | API Integration | 100% | Completed |
 | Authentication | 100% | Completed |
-| Layout Components | 75% | In Progress |
-| GET Operations | 0% | Not Started |
+| Layout Components | 100% | Completed |
+| GET Operations | 100% | Completed |
 | POST/PUT/DELETE Operations | 0% | Not Started |
 | Testing | 0% | Not Started |
-| Overall | 30% | Phase 1 Completed, Phase 2 Started |
+| Overall | 75% | Phase 1, 2 & 3 Completed, Phase 4 Next |
 
 ## Notes
 
 - The React SPA will use the existing .NET 9.0 API as a backend for frontend (BFF)
 - API base URL: https://localhost:7264/
-- Authentication will be handled via custom headers (X-Username, X-Role)
+- Authentication will be handled via JWT tokens in the Authorization header
 - GET operations are prioritized for initial implementation
+- Authentication features are now fully implemented with login/register forms, logout functionality, and role-based conditional rendering
+- User authentication uses JWT tokens with the API endpoints `/api/users/login`, `/api/users/register`, and `/api/users/logoff`
