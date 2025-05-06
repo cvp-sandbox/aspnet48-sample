@@ -47,7 +47,7 @@ project.fragment.lock.json
 artifacts/
 
 # .NET Core
-**/Properties/launchSettings.json
+#**/Properties/launchSettings.json
 **/bin/
 **/obj/
 
