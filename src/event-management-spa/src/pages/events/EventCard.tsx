@@ -40,7 +40,7 @@ const EventCard = ({ event }: EventCardProps) => {
   };
 
   return (
-    <Card className="h-100 shadow-sm">
+    <Card className="h-100 shadow-sm event-card">
       <Card.Body>
         <Card.Title>{event.title || (event as any).name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">

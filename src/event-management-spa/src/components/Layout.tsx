@@ -16,7 +16,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <main className="flex-grow-1 py-4">
-        <Container>
+        <Container className="body-content">
           {children}
         </Container>
       </main>

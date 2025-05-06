@@ -10,7 +10,7 @@ const Header = () => {
   const { isAuthenticated, role } = useAuth();
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
+    <Navbar bg="primary" variant="dark" expand="lg" className="mb-3">
       <Container>
         <Navbar.Brand as={Link} to="/">.NET Events</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

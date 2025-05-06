@@ -50,7 +50,32 @@ const EventList = () => {
         )}
       </div>
       
-      {/* Filter section hidden as requested */}
+      {/* Search and filter section */}
+      <div className="search-container mb-4">
+        <Row>
+          <Col md={8}>
+            <InputGroup>
+              <Form.Control
+                placeholder="Search events..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Button variant="outline-secondary">
+                <FaSearch />
+              </Button>
+            </InputGroup>
+          </Col>
+          <Col md={4} className="d-flex align-items-center mt-3 mt-md-0">
+            <Form.Check
+              type="checkbox"
+              id="upcoming-only"
+              label="Show upcoming events only"
+              checked={showUpcomingOnly}
+              onChange={(e) => setShowUpcomingOnly(e.target.checked)}
+            />
+          </Col>
+        </Row>
+      </div>
       
       {/* Loading state */}
       {isLoading && (

@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import './styles/Site.css'; // Import the Site.css to match original ASP.NET styling
 
 // Import pages
 import Home from './pages/Home';

@@ -16,37 +16,35 @@ const Home = () => {
       {/* Hero section */}
       <Row className="mb-5">
         <Col>
-          <Card className="bg-dark text-white">
-            <Card.Body className="p-5">
-              <h1 className="display-4">Welcome to Event Management</h1>
-              <p className="lead">
-                Discover, register, and manage events all in one place.
-              </p>
-              <hr className="my-4" />
-              <p>
-                Browse our upcoming events or create your own event today.
-              </p>
+          <div className="jumbotron">
+            <h1 className="display-4">Welcome to Event Management</h1>
+            <p className="lead">
+              Discover, register, and manage events all in one place.
+            </p>
+            <hr className="my-4" />
+            <p>
+              Browse our upcoming events or create your own event today.
+            </p>
+            <Button
+              as={Link as any}
+              to="/events"
+              variant="primary"
+              size="lg"
+              className="me-2"
+            >
+              Browse Events
+            </Button>
+            {isAuthenticated && (
               <Button
                 as={Link as any}
-                to="/events"
-                variant="primary"
+                to="/events/create"
+                variant="outline-primary"
                 size="lg"
-                className="me-2"
               >
-                Browse Events
+                Create Event
               </Button>
-              {isAuthenticated && (
-                <Button
-                  as={Link as any}
-                  to="/events/create"
-                  variant="outline-light"
-                  size="lg"
-                >
-                  Create Event
-                </Button>
-              )}
-            </Card.Body>
-          </Card>
+            )}
+          </div>
         </Col>
       </Row>
       
