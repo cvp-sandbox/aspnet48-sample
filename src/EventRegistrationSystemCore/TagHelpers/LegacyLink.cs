@@ -7,9 +7,9 @@ namespace EventRegistrationSystemCore.TagHelpers;
 [HtmlTargetElement("legacy-link")]
 public class LegacyLink : TagHelper
 {
-    public string Href { get; set; }
+    public required string Href { get; set; }
 
-    public string Class { get; set; }
+    public required string Class { get; set; }
 
     public string? Content { get; set; }
 

@@ -18,7 +18,7 @@ namespace EventRegistrationSystemCore.ViewComponents
         public IViewComponentResult Invoke()
         {
             // If user is not authenticated, return empty result
-            if (!HttpContext.User.Identity.IsAuthenticated)
+            if (HttpContext.User.Identity == null || !HttpContext.User.Identity.IsAuthenticated)
             {
                 return View(new List<Registration>());
             }

@@ -44,71 +44,71 @@ public class SQLiteRoleStore : IRoleStore<IdentityRole>
         }
     }
 
-    public async Task<IdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+public async Task<IdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+
+    using (var connection = _connection)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        connection.Open();
+        var role = await connection.QueryFirstOrDefaultAsync<IdentityRole>(
+            "SELECT RoleId as Id, Name, NormalizedName FROM Roles WHERE RoleId = @RoleId",
+            new { RoleId = int.Parse(roleId) });
 
-        using (var connection = _connection)
-        {
-            connection.Open();
-            var role = await connection.QueryFirstOrDefaultAsync<IdentityRole>(
-                "SELECT RoleId as Id, Name, NormalizedName FROM Roles WHERE RoleId = @RoleId",
-                new { RoleId = int.Parse(roleId) });
-
-            return role;
-        }
+        return role;
     }
+}
 
-    public async Task<IdentityRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+public async Task<IdentityRole?> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+
+    using (var connection = _connection)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        connection.Open();
+        // Assuming Name is used as NormalizedName in your legacy app
+        var role = await connection.QueryFirstOrDefaultAsync<IdentityRole>(
+            "SELECT RoleId as Id, Name, Name as NormalizedName FROM Roles WHERE Name = @Name",
+            new { Name = normalizedRoleName });
 
-        using (var connection = _connection)
-        {
-            connection.Open();
-            // Assuming Name is used as NormalizedName in your legacy app
-            var role = await connection.QueryFirstOrDefaultAsync<IdentityRole>(
-                "SELECT RoleId as Id, Name, Name as NormalizedName FROM Roles WHERE Name = @Name",
-                new { Name = normalizedRoleName });
-
-            return role;
-        }
+        return role;
     }
+}
 
-    public Task<string> GetNormalizedRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(role.Name); // Legacy app likely doesn't have normalized names
-    }
+public Task<string?> GetNormalizedRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
+{
+    return Task.FromResult(role.Name); // Legacy app likely doesn't have normalized names
+}
 
     public Task<string> GetRoleIdAsync(IdentityRole role, CancellationToken cancellationToken)
     {
         return Task.FromResult(role.Id);
     }
 
-    public Task<string> GetRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(role.Name);
-    }
+public Task<string?> GetRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
+{
+    return Task.FromResult(role.Name);
+}
 
-    public Task SetNormalizedRoleNameAsync(IdentityRole role, string normalizedName, CancellationToken cancellationToken)
-    {
-        role.NormalizedName = normalizedName;
-        return Task.CompletedTask; // We don't need to save this as legacy app doesn't use it
-    }
+public Task SetNormalizedRoleNameAsync(IdentityRole role, string? normalizedName, CancellationToken cancellationToken)
+{
+    role.NormalizedName = normalizedName;
+    return Task.CompletedTask; // We don't need to save this as legacy app doesn't use it
+}
 
-    public async Task SetRoleNameAsync(IdentityRole role, string roleName, CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        role.Name = roleName;
+public async Task SetRoleNameAsync(IdentityRole role, string? roleName, CancellationToken cancellationToken)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    role.Name = roleName ?? string.Empty;
 
-        using (var connection = _connection)
-        {
-            connection.Open();
-            await connection.ExecuteAsync(
-                "UPDATE Roles SET Name = @Name WHERE RoleId = @RoleId",
-                new { Name = roleName, RoleId = int.Parse(role.Id) });
-        }
+    using (var connection = _connection)
+    {
+        connection.Open();
+        await connection.ExecuteAsync(
+            "UPDATE Roles SET Name = @Name WHERE RoleId = @RoleId",
+            new { Name = roleName, RoleId = int.Parse(role.Id) });
     }
+}
 
     public async Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
     {

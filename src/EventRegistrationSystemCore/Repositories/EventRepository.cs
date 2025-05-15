@@ -31,22 +31,22 @@ namespace EventRegistrationSystemCore.Repositories
             }
         }
 
-        public Event GetEventById(int eventId)
+    public Event? GetEventById(int eventId)
+    {
+        _connection.Open();
+        try
         {
-            _connection.Open();
-            try
-            {
-                return _connection.QueryFirstOrDefault<Event>(@"
-                    SELECT e.*, 
-                    (SELECT COUNT(*) FROM Registrations r WHERE r.EventId = e.EventId) AS RegistrationCount
-                    FROM Events e
-                    WHERE e.EventId = @EventId", new { EventId = eventId });
-            }
-            finally
-            {
-                _connection.Close();
-            }
+            return _connection.QueryFirstOrDefault<Event>(@"
+                SELECT e.*, 
+                (SELECT COUNT(*) FROM Registrations r WHERE r.EventId = e.EventId) AS RegistrationCount
+                FROM Events e
+                WHERE e.EventId = @EventId", new { EventId = eventId });
         }
+        finally
+        {
+            _connection.Close();
+        }
+    }
 
         public IEnumerable<Event> GetFeaturedEvents(int count)
         {

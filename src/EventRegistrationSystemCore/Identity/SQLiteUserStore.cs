@@ -223,16 +223,16 @@ public class SQLiteUserStore :
     // when properties like LockoutEnabled, etc. are changed
 
     // Additional IUserEmailStore implementation
-    public Task SetEmailAsync(ApplicationUser user, string email, CancellationToken cancellationToken)
-    {
-        user.Email = email;
-        return Task.CompletedTask;
-    }
+public Task SetEmailAsync(ApplicationUser user, string? email, CancellationToken cancellationToken)
+{
+    user.Email = email ?? string.Empty;
+    return Task.CompletedTask;
+}
 
-    public Task<string> GetEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.Email);
-    }
+public Task<string?> GetEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
+{
+    return Task.FromResult(user.Email);
+}
 
     public Task<bool> GetEmailConfirmedAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
@@ -255,19 +255,18 @@ public class SQLiteUserStore :
         return result;
     }
 
-    public Task<string> GetNormalizedEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.Email); // Legacy app likely doesn't normalize
-    }
+public Task<string?> GetNormalizedEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
+{
+    return Task.FromResult(user.Email); // Legacy app likely doesn't normalize
+}
 
-    public Task SetNormalizedEmailAsync(ApplicationUser user, string normalizedEmail, CancellationToken cancellationToken)
-    {
-        // Legacy app doesn't use normalized values, so just store it in memory
-        return Task.CompletedTask;
-    }
+public Task SetNormalizedEmailAsync(ApplicationUser user, string? normalizedEmail, CancellationToken cancellationToken)
+{
+    // Legacy app doesn't use normalized values, so just store it in memory
+    return Task.CompletedTask;
+}
 
 
     // Implement other IUserStore and IUserPasswordStore methods
     // Use the same SQL queries as in your legacy app
 }
-

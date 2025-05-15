@@ -5,12 +5,12 @@ namespace EventRegistrationSystemCore.Models
     public class Event
     {
         public int EventId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public DateTime EventDate { get; set; }
-        public string Location { get; set; }
+        public required string Location { get; set; }
         public int MaxAttendees { get; set; }
-        public string CreatedBy { get; set; }
+        public required string CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
 
         // Navigation property (not stored in DB)
@@ -21,11 +21,11 @@ namespace EventRegistrationSystemCore.Models
     {
         public int RegistrationId { get; set; }
         public int EventId { get; set; }
-        public string UserId { get; set; }
+        public required string UserId { get; set; }
         public DateTime RegistrationDate { get; set; }
 
         // Navigation property (not stored in DB)
-        public string UserName { get; set; }
-        public Event Event { get; set; }
+        public required string UserName { get; set; }
+        public required Event Event { get; set; }
     }
 }

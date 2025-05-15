@@ -116,32 +116,43 @@ builder.Services.AddAuthentication(options =>
     options.Cookie.Path = "/";
 
     // Add events to debug the cookie creation
-    options.Events = new CookieAuthenticationEvents
-    {
-        OnSignedIn = context =>
+        options.Events = new CookieAuthenticationEvents
         {
-            Console.WriteLine("User signed in");
-            return Task.CompletedTask;
-        },
-        OnSigningOut = context =>
-        {
-            Console.WriteLine("User signing out");
-            return Task.CompletedTask;
-        },
-        OnRedirectToLogin = context =>
-        {
-            Console.WriteLine("Redirecting to login");
-            return Task.CompletedTask;
-        },
-        OnValidatePrincipal = context =>
-        {
-            Console.WriteLine("Cookie validating principal event");
-            Console.WriteLine($"Authentication scheme: {context.Scheme.Name}");
-            Console.WriteLine($"Cookie name: {context.Options.Cookie.Name}");
-            Console.WriteLine($"Has cookie: {context.HttpContext.Request.Cookies.ContainsKey(context.Options.Cookie.Name)}");
-            return Task.CompletedTask;
-        }
-    };
+            OnSignedIn = context =>
+            {
+                Console.WriteLine("User signed in");
+                return Task.CompletedTask;
+            },
+            OnSigningOut = context =>
+            {
+                Console.WriteLine("User signing out");
+                return Task.CompletedTask;
+            },
+            OnRedirectToLogin = context =>
+            {
+                Console.WriteLine("Redirecting to login");
+                return Task.CompletedTask;
+            },
+            OnValidatePrincipal = context =>
+            {
+                Console.WriteLine("Cookie validating principal event");
+                Console.WriteLine($"Authentication scheme: {context.Scheme.Name}");
+                Console.WriteLine($"Cookie name: {context.Options.Cookie.Name}");
+                
+                // Check if cookie name is not null before using it as a key
+                var cookieName = context.Options.Cookie.Name;
+                if (cookieName != null)
+                {
+                    Console.WriteLine($"Has cookie: {context.HttpContext.Request.Cookies.ContainsKey(cookieName)}");
+                }
+                else
+                {
+                    Console.WriteLine("Cookie name is null");
+                }
+                
+                return Task.CompletedTask;
+            }
+        };
 });
 
 

@@ -29,7 +29,7 @@
     @await Component.InvokeAsync("FeaturedEvents")
 
     <!-- Upcoming Events - User-specific content (show when logged in) -->
-    @if (User.Identity.IsAuthenticated)
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         @await Component.InvokeAsync("UpcomingEvents")
     }

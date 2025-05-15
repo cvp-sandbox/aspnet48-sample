@@ -130,7 +130,7 @@ public class HomeController : Controller
     public IActionResult UpcomingEvents()
     {
         // If user is not authenticated, return empty result
-        if (!User.Identity.IsAuthenticated)
+        if (User.Identity == null || !User.Identity.IsAuthenticated)
         {
             return PartialView("_UpcomingEvents", new List<Registration>());
         }

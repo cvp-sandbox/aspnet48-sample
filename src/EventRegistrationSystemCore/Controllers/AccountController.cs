@@ -69,7 +69,7 @@ public class AccountController : Controller
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName ?? user.Email)
+                new Claim(ClaimTypes.Name, user.UserName ?? user.Email ?? string.Empty)
             };
 
             if (!string.IsNullOrEmpty(user.Email))

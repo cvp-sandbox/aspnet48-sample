@@ -7,7 +7,7 @@ public static class AuthHeaders
     public const string UserEmail = "X-UserEmail";
     public const string UserRoles = "X-UserRoles";
 
-    public static string GetCustomHeader(this HttpRequest request, string headerName)
+    public static string? GetCustomHeader(this HttpRequest request, string headerName)
     {
         return request.Headers[headerName];
     }

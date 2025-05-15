@@ -6,7 +6,7 @@ namespace EventRegistrationSystemCore.Repositories
     public interface IEventRepository
     {
         IEnumerable<Event> GetAllEvents();
-        Event GetEventById(int eventId);
+        Event? GetEventById(int eventId);
         IEnumerable<Event> GetUpcomingEvents(int count);
         IEnumerable<Event> GetFeaturedEvents(int count);
     }
