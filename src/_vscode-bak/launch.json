@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run IIS Express - EventRegistrationSystem",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build aspnet-mvc - EventRegistrationSystem",
+      "program": "iisexpress.exe",
+      "args": [
+        "/site:EventRegistrationSystem",
+        "/config:${workspaceFolder}/.vscode/applicationhost.config",
+        "/trace:error"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "windows": {
+        "program": "C:\\Program Files\\IIS Express\\iisexpress.exe"
+      }
+    },
+    {
+      "name": "Run IIS Express (nodebug) - EventRegistrationSystem",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build aspnet-mvc - EventRegistrationSystem",
+      "program": "iisexpress.exe",
+      "args": [
+        "/site:EventRegistrationSystem",
+        "/config:${workspaceFolder}/.vscode/applicationhost.config",
+        "/trace:error"
+      ],
+      "noDebug": true,
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "windows": {
+        "program": "C:\\Program Files\\IIS Express\\iisexpress.exe"
+      }
+    }
+  ]
+}

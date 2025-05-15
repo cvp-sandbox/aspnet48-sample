@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "nuget restore - EventRegistrationSystem",
+      "type": "shell",
+      "command": "nuget",
+      "args": [
+        "restore",
+        "EventManagement-ORIGINAL.sln"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "build aspnet-mvc - EventRegistrationSystem",
+      "type": "shell",
+      "command": "MSBuild.exe",
+      "args": [
+        "EventRegistrationSystem\\EventRegistrationSystem.csproj",
+        "/p:Configuration=Debug",
+        "/p:Platform=AnyCPU"
+      ],
+      "dependsOn": ["nuget restore"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
