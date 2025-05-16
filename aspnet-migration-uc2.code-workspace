@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "./docs"
+		},
+		{
+			"path": "./src"
+		},
+		{
+			"path": "./tests"
+		},
+		{
+			"path": "./_db"
+		}
+	],
+	"settings": {}
+}
