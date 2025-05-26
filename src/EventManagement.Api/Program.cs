@@ -89,6 +89,9 @@ if (app.Environment.IsDevelopment())
 
     app.MapOpenApi();              // Exposes the OpenAPI JSON at /openapi/v1.json
     app.MapScalarApiReference();   // Exposes the Scalar UI at /scalar/v1
+
+    //rediirect root GET request to Scalar UI
+    app.MapGet("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
 }
 
 
